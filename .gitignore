@@ -1,19 +1,49 @@
-CMakeLists.txt.user
+# ====================================================================
+# Build & Output Directories
+# ====================================================================
+# Targets the exact build folder you are creating via build.bat / run.bat
+/build/
+/build-*/
+cmake-build-*/
+
+# ====================================================================
+# CMake Artifacts (Fallback if build happens in root)
+# ====================================================================
+CMakeFiles/
+CMakeScripts/
 CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
+CMakeLists.txt.user
+CMakeUserPresets.json
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
-CTestTestfile.cmake
-_deps
-CMakeUserPresets.json
+Makefile
+_deps/
 
-# CLion
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#cmake-build-*
+# ====================================================================
+# Testing Artifacts
+# ====================================================================
+Testing/
+CTestTestfile.cmake
+
+# ====================================================================
+# IDEs & Editor Clutter
+# ====================================================================
+# Visual Studio Code
+.vscode/
+
+# JetBrains / CLion
+.idea/
+
+# Visual Studio (if used via MSVC tools)
+.vs/
+*.sln
+*.vcxproj
+*.user
+
+# ====================================================================
+# OS & System Clutter
+# ====================================================================
+Thumbs.db
+Desktop.ini
+.DS_Store
