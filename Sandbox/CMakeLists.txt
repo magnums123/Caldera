@@ -6,3 +6,10 @@ add_executable(Sandbox ${SANDBOX_SOURCES})
 
 # Link against our Engine library
 target_link_libraries(Sandbox PRIVATE Engine)
+
+add_custom_command(TARGET Sandbox POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:Engine>
+      $<TARGET_FILE_DIR:Sandbox>
+    COMMENT "Copying Engine DLL to Sandbox output directory..."
+  )
