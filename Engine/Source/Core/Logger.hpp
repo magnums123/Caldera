@@ -14,7 +14,7 @@ inline constexpr bool LOG_ERROR_ENABLED = true;
 inline constexpr bool LOG_WARN_ENABLED = true;
 inline constexpr bool LOG_INFO_ENABLED = true;
 
-#if DEBUG == 0
+#if defined(DEBUG)
 inline constexpr bool LOG_DEBUG_ENABLED = true;
 inline constexpr bool LOG_TRACE_ENABLED = true;
 #else

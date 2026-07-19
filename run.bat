@@ -2,7 +2,7 @@
 setlocal
 
 :: Default to Debug mode for running, feel free to change to Release
-set "BUILD_TYPE=Debug"
+set "BUILD_TYPE=Release"
 
 echo [INFO] Auto-building Sandbox (%BUILD_TYPE%) before running...
 cmake -G "Ninja" -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -B build

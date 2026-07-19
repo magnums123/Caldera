@@ -10,7 +10,7 @@ int main()
     LOG_DEBUG("A test message: {}", 3.1419f);
     LOG_TRACE("A test message: {}", 3.1419f);
 
-    ASSERT_MSG(false, "ASSERTION ENABLED");
+    ASSERT_MSG_DEBUG(false, "ASSERTION ENABLED");
 
     return 0;
 }
