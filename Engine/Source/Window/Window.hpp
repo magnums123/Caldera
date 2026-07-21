@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include "Defines.hpp"
 #include "Utility/String.hpp"
@@ -24,9 +25,11 @@ class Window
     inline void* getHandle() { return handle; }
 
     virtual void toggleFullscreen() = 0;
+    virtual bool shouldClose() = 0;
+    virtual void close() = 0;
     virtual void update(float deltaTime) = 0;
 
-    static Window* Create(const WindowCreateInfo& createInfo);
+    static std::unique_ptr<Window> Create(const WindowCreateInfo& createInfo);
 
    protected:
     void* handle;

@@ -15,7 +15,7 @@ namespace CAL
 static float clockFrequency;
 static std::int64_t startTime;
 
-Platform* Platform::Create() { return new Win32Platform(); }
+std::unique_ptr<Platform> Platform::Create() { return std::make_unique<Win32Platform>(Win32Platform()); }
 
 Win32Platform::Win32Platform()
 {

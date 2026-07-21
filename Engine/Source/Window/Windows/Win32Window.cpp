@@ -1,7 +1,5 @@
 #include "Win32Window.hpp"
 
-#include <winuser.h>
-
 #include <exception>
 
 #include "Core/Asserts.hpp"
@@ -15,9 +13,14 @@ bool Win32Window::classRegistered = false;
 HINSTANCE Win32Window::hInstance = GetModuleHandle(0);
 const char* Win32Window::className = "Win32 Window Class";
 
+static bool windowClosed{ false };
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-Window* Window::Create(const WindowCreateInfo& createInfo) { return new Win32Window(createInfo); }
+std::unique_ptr<Window> Window::Create(const WindowCreateInfo& createInfo)
+{
+    return std::make_unique<Win32Window>(Win32Window(createInfo));
+}
 
 Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo)
 {
@@ -61,11 +64,17 @@ Win32Window::~Win32Window() {}
 
 void Win32Window::toggleFullscreen() {}
 
+bool Win32Window::shouldClose() { return windowClosed; }
+
+void Win32Window::close() { PostQuitMessage(0); }
+
 void Win32Window::update(float deltaTime)
 {
     MSG msg{};
     while (GetMessage(&msg, nullptr, 0, 0))
     {
+        if (msg.message == WM_CLOSE) LOG_INFO("Close message recieved at top level");
+        if (msg.message == WM_DESTROY) LOG_INFO("Destroy message recieved at top level");
         TranslateMessage(&msg);
         DispatchMessageA(&msg);
     }
@@ -78,10 +87,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_ERASEBKGND:
             // 1 specifically tells the os that this will be handled by the app(read docs)
             return 1;
-        case WM_CLOSE:
-            // TODO: Fire an event to tell Application a Window was closed
+        // case WM_CLOSE:
+        // TODO: Fire an event to tell Application a Window was closed
         //     return 0;
         case WM_DESTROY:
+            LOG_INFO("Destroy message recieved at top level");
+            windowClosed = true;
             PostQuitMessage(0);
             return 0;
         case WM_SIZE:

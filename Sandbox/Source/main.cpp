@@ -1,6 +1,7 @@
 #include <Core/Asserts.hpp>
 #include <Core/Logger.hpp>
-#include <Window/Window.hpp>
+
+#include "Core/Application.h"
 
 int main()
 {
@@ -11,16 +12,10 @@ int main()
     // LOG_DEBUG("A test message: {}", 3.1419f);
     // LOG_TRACE("A test message: {}", 3.1419f);
 
-    CAL::WindowCreateInfo windowCreateInfo{
-        "Test Window",
-        1280,
-        720,
-    };
-    CAL::Window* window = CAL::Window::Create(windowCreateInfo);
+    CAL::AppInfo appInfo{ "Test Window", 1280, 720, true };
 
-    if (window) window->update(0);
-
-    delete window;
+    CAL::Application app{ appInfo };
+    app.run();
 
     // ASSERT_MSG_DEBUG(false, "ASSERTION ENABLED");
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include "Defines.hpp"
 
@@ -22,6 +23,6 @@ class Platform
     virtual float getAbsoluteTime() = 0;
     virtual void sleep(uint64_t ms) = 0;
 
-    static Platform* Create();
+    static std::unique_ptr<Platform> Create();
 };
 }  // namespace CAL

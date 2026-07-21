@@ -19,6 +19,8 @@ class Win32Window : public Window
     ~Win32Window() override;
 
     void toggleFullscreen() override;
+    void close() override;
+    bool shouldClose() override;
     void update(float deltaTime) override;
 
    private:
