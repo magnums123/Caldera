@@ -2,12 +2,13 @@
 setlocal enabledelayedexpansion
 
 :: Ask for Build Type
-echo ====================================
-echo Select Build Type:
-echo [1] Debug
-echo [2] Release
-echo ====================================
-set /p build_choice="Enter choice (1-2): "
+REM echo ====================================
+REM echo Select Build Type:
+REM echo [1] Debug
+REM echo [2] Release
+REM echo ====================================
+REM set /p build_choice="Enter choice (1-2): "
+set build_choice=1
 
 if "%build_choice%"=="1" (
     set BUILD_TYPE=Debug
@@ -19,14 +20,15 @@ if "%build_choice%"=="1" (
 )
 
 :: Ask what to build
-echo.
-echo ====================================
-echo Select Target:
-echo [1] Entire Project (All)
-echo [2] Sandbox (Executable only)
-echo [3] Engine (Library only)
-echo ====================================
-set /p target_choice="Enter choice (1-3): "
+REM echo.
+REM echo ====================================
+REM echo Select Target:
+REM echo [1] Entire Project (All)
+REM echo [2] Sandbox (Executable only)
+REM echo [3] Engine (Library only)
+REM echo ====================================
+REM set /p target_choice="Enter choice (1-3): "
+set target_choice=1
 
 if "%target_choice%"=="1" (
     set TARGET=

@@ -7,6 +7,14 @@ add_executable(Sandbox ${SANDBOX_SOURCES})
 # Link against our Engine library
 target_link_libraries(Sandbox PRIVATE Engine)
 
+target_compile_definitions(Sandbox
+    PRIVATE
+        $<$<CONFIG:Debug>:DEBUG>
+        $<$<CONFIG:Release>:NDEBUG RELEASE>
+        $<$<CONFIG:RelWithDebInfo>:NDEBUG RELEASE>
+        $<$<CONFIG:MinSizeRel>:NDEBUG RELEASE>
+)
+
 add_custom_command(TARGET Sandbox POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       $<TARGET_FILE:Engine>
