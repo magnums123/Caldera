@@ -27,8 +27,10 @@ class Win32Window : public Window
     static bool classRegistered;
     static HINSTANCE hInstance;
     static const char* className;
+    static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     static void registerClass();
+    bool closeRequested{ false };
 };
 
 #endif

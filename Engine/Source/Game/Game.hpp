@@ -1,0 +1,21 @@
+#pragma once
+
+#include "Defines.hpp"
+
+namespace CAL
+{
+
+class Game
+{
+   public:
+    Game() {}
+    virtual ~Game() = default;
+
+    virtual void update(float deltaTime) = 0;
+    virtual void render() = 0;
+    // virtual void onresize(uint32_t newWidth, uint32_t newHeight) = 0;
+
+   private:
+};
+
+}  // namespace CAL

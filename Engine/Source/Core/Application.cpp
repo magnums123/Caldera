@@ -1,32 +1,41 @@
 #include "Application.h"
 
 #include <memory>
-
-#include "Window/Window.hpp"
+#include <utility>
 
 namespace CAL
 {
 
-Application::Application(const AppInfo& appInfo) : platform(Platform::Create()), window(nullptr)
+Application::Application(const AppInfo& appInfo, std::unique_ptr<Game> game)
+    : platform(Platform::Create()), window(nullptr), gameInstance(std::move(game)), useWindow(appInfo.useWindow)
 {
     // platform = Platform::Create();
-    if (appInfo.useWindow)
+    if (useWindow)
     {
         WindowCreateInfo createInfo{ .name = appInfo.appName, .width = appInfo.width, .height = appInfo.height };
         window = Window::Create(createInfo);
     }
 
-    running = true;
+    isRunning = true;
+    isSuspended = false;
 }
 
 Application::~Application() {}
 
 void Application::run()
 {
-    while (running)
+    while (isRunning)
     {
-        if (window) running = window->shouldClose();
-        if (window) window->update(0);
+        if (!isSuspended)
+        {
+            if (useWindow)
+            {
+                isRunning = !window->shouldClose();
+                window->update(0);
+                gameInstance->update(0);
+                gameInstance->render();
+            }
+        }
     }
 }
 }  // namespace CAL

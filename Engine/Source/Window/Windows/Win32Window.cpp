@@ -13,13 +13,9 @@ bool Win32Window::classRegistered = false;
 HINSTANCE Win32Window::hInstance = GetModuleHandle(0);
 const char* Win32Window::className = "Win32 Window Class";
 
-static bool windowClosed{ false };
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 std::unique_ptr<Window> Window::Create(const WindowCreateInfo& createInfo)
 {
-    return std::make_unique<Win32Window>(Win32Window(createInfo));
+    return std::make_unique<Win32Window>(createInfo);
 }
 
 Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo)
@@ -28,7 +24,7 @@ Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo
 
     handle = CreateWindowEx(
         0, className, createInfo.name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-        CW_USEDEFAULT, nullptr, nullptr, hInstance, nullptr);
+        CW_USEDEFAULT, nullptr, nullptr, hInstance, this);
 
     ASSERT_MSG(handle, "Failed to create Win32 Window.");
     ShowWindow((HWND)handle, SW_SHOW);
@@ -60,41 +56,63 @@ void Win32Window::registerClass()
     LOG_DEBUG("Succesfully registered Window Class.");
 }
 
-Win32Window::~Win32Window() {}
+Win32Window::~Win32Window()
+{
+    if (handle)
+    {
+        DestroyWindow(static_cast<HWND>(handle));
+        handle = nullptr;
+    }
+}
 
 void Win32Window::toggleFullscreen() {}
 
-bool Win32Window::shouldClose() { return windowClosed; }
+bool Win32Window::shouldClose() { return closeRequested; }
 
-void Win32Window::close() { PostQuitMessage(0); }
+void Win32Window::close()
+{
+    PostQuitMessage(0);
+    closeRequested = true;
+}
 
 void Win32Window::update(float deltaTime)
 {
     MSG msg{};
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (PeekMessage(&msg, (HWND)handle, 0, 0, PM_REMOVE))
     {
-        if (msg.message == WM_CLOSE) LOG_INFO("Close message recieved at top level");
-        if (msg.message == WM_DESTROY) LOG_INFO("Destroy message recieved at top level");
         TranslateMessage(&msg);
         DispatchMessageA(&msg);
     }
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    Win32Window* window{ nullptr };
+
+    if (uMsg == WM_NCCREATE)
+    {
+        CREATESTRUCT* createStruct = reinterpret_cast<CREATESTRUCT*>(lParam);
+        window = reinterpret_cast<Win32Window*>(createStruct->lpCreateParams);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
+    }
+    else
+        window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     switch (uMsg)
     {
         case WM_ERASEBKGND:
             // 1 specifically tells the os that this will be handled by the app(read docs)
             return 1;
         // case WM_CLOSE:
-        // TODO: Fire an event to tell Application a Window was closed
+        //     // TODO: Fire an event to tell Application a Window was closed
+        //     if (window) window->close();
         //     return 0;
         case WM_DESTROY:
-            LOG_INFO("Destroy message recieved at top level");
-            windowClosed = true;
-            PostQuitMessage(0);
+        {
+            if (window) window->close();
+
+            // PostQuitMessage(0);
             return 0;
+        }
         case WM_SIZE:
         {
             RECT rect;
@@ -129,6 +147,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 // TODO: Fire Mouse Scroll event
             }
         }
+        break;
         case WM_LBUTTONDOWN:
         case WM_MBUTTONDOWN:
         case WM_RBUTTONDOWN:
@@ -139,8 +158,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             bool pressed = (uMsg == WM_LBUTTONDOWN || uMsg == WM_MBUTTONDOWN || uMsg == WM_RBUTTONDOWN);
             // TODO: Fire Mouse Button Event
         }
-        default:
-            return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
