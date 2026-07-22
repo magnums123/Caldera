@@ -4,7 +4,6 @@
 
 #include "Defines.hpp"
 #include "Game/Game.hpp"
-#include "Platform/Platform.hpp"
 #include "Utility/String.hpp"
 #include "Window/Window.hpp"
 
@@ -32,7 +31,6 @@ class Application
 
     bool useWindow{ true };
 
-    std::unique_ptr<Platform> platform{ nullptr };
     std::unique_ptr<Window> window{ nullptr };
     std::unique_ptr<Game> gameInstance{ nullptr };
 };

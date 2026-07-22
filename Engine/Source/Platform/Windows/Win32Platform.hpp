@@ -14,14 +14,14 @@ class Win32Platform : public Platform
    public:
     Win32Platform();
     ~Win32Platform() override;
-    void* allocate(size_t size, bool aligned) override;
-    void freeMemory(void* block, bool aligned) override;
-    void* zeroMemory(void* block, size_t size) override;
-    void copyMemory(void* dst, void* src, size_t size) override;
-    void* setMemory(void* dst, std::int32_t value, size_t size) override;
+    void* allocateMemory(size_t size, bool aligned) const override;
+    void freeMemory(void* block, bool aligned) const override;
+    void* zeroMemory(void* block, size_t size) const override;
+    void copyMemory(void* dst, void* src, size_t size) const override;
+    void* setMemory(void* dst, std::int32_t value, size_t size) const override;
 
-    float getAbsoluteTime() override;
-    void sleep(uint64_t ms) override;
+    float getAbsoluteTime() const override;
+    void sleep(uint64_t ms) const override;
 };
 
 #endif

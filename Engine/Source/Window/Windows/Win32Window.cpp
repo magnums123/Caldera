@@ -3,6 +3,7 @@
 #include <exception>
 
 #include "Core/Asserts.hpp"
+#include "Core/Event/WindowEvents.hpp"
 #include "Core/Logger.hpp"
 
 #if defined(_WIN32)
@@ -12,6 +13,8 @@ namespace CAL
 bool Win32Window::classRegistered = false;
 HINSTANCE Win32Window::hInstance = GetModuleHandle(0);
 const char* Win32Window::className = "Win32 Window Class";
+
+static EventDispatcher EventDispatcher{};
 
 std::unique_ptr<Window> Window::Create(const WindowCreateInfo& createInfo)
 {
@@ -108,6 +111,9 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
         //     return 0;
         case WM_DESTROY:
         {
+            WindowCloseEvent e{};
+            window->dispatcher.dispatch(e);
+
             if (window) window->close();
 
             // PostQuitMessage(0);
@@ -117,8 +123,11 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
         {
             RECT rect;
             GetClientRect(hwnd, &rect);
-            auto newWidth = rect.right - rect.left;
-            auto newHeight = rect.bottom - rect.top;
+            uint32_t newWidth = rect.right - rect.left;
+            uint32_t newHeight = rect.bottom - rect.top;
+
+            WindowResizeEvent e{ newWidth, newHeight };
+            window->dispatcher.dispatch(e);
             // TODO: Fire Window Resize event
         }
         break;

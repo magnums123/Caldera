@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 
+#include "Core/Event/Event.hpp"
 #include "Defines.hpp"
 #include "Utility/String.hpp"
 
@@ -20,9 +21,11 @@ class Window
     Window(const WindowCreateInfo& createInfo) : width(createInfo.width), height(createInfo.height) {}
     virtual ~Window() = default;
 
+    EventDispatcher dispatcher;
+
     inline uint32_t getWidth() const { return width; }
     inline uint32_t getHeight() const { return height; }
-    inline void* getHandle() { return handle; }
+    inline void* getHandle() const { return handle; }
 
     virtual void toggleFullscreen() = 0;
     virtual bool shouldClose() = 0;
