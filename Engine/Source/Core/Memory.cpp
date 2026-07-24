@@ -58,7 +58,6 @@ void* allocateMemory(size_t size, MemoryTag tag)
     stats.totalAllocated += size;
     stats.taggedALlocations[(size_t)tag] += size;
 
-    LOG_DEBUG("Starting Allocation");
     // TODO: Memory alignment
     // auto block = platform->allocateMemory(size, false);
     // return platform->zeroMemory(block, size);

@@ -1,8 +1,6 @@
 #include "Application.h"
 
-#include <memory>
-#include <utility>
-
+#include "Core/Containers/Vector.hpp"
 #include "Core/Event/Event.hpp"
 #include "Core/Event/KeyCodes.hpp"
 #include "Core/Event/KeyEvents.hpp"
@@ -19,10 +17,17 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
 {
     Memory::initMemory();
 
-    size_t size = 1024 * 1024;
-    auto memory = Memory::allocateMemory(size, Memory::MemoryTag::APPLICATION);
+    Vector<int> vec{ { 122, 2, 3, 4, 5, 62, 7, 8, 9, 0 } };
+    vec.resize(5);
+    vec.pop();
+    vec.pushBack(30);
+    vec.remove(0);
+    // for (auto i = 0; i < vec.size(); i++) LOG_DEBUG("{}", vec[i]);
+    for (auto i : vec) LOG_DEBUG("{}", i);
+
+    LOG_INFO("Size of 4 ints: {}", sizeof(int) * 4);
+
     LOG_TRACE("{}", Memory::getMemoryUsageString());
-    Memory::freeMemory(memory, size, Memory::MemoryTag::APPLICATION);
 
     if (useWindow)
     {
@@ -35,7 +40,7 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
             [&](Event& e)
             {
                 isRunning = false;
-                e.handled = true;
+                e.handle();
             });
         window->dispatcher.addListener(
             EventType::KEY_PRESSED,
@@ -44,7 +49,7 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
                 auto re = e.toType<const KeyPressEvent*>();
                 auto keyCodeStr = re->getKeyCode();
                 LOG_INFO("Key Pressed: {}", keyCodeToString(re->getKeyCode()));
-                e.handled = true;
+                e.handle();
             });
         window->dispatcher.addListener(
             EventType::WINDOW_RESIZED,
@@ -53,6 +58,7 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
                 auto re = e.toType<const WindowResizeEvent*>();
 
                 LOG_DEBUG("Window Resized. New size = ({}, {})", re->getWidth(), re->getHeight());
+                e.handle();
             });
     }
 

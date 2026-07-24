@@ -4,7 +4,6 @@
 #include <functional>
 #include <map>
 
-#include "Core/Logger.hpp"
 #include "Utility/String.hpp"
 
 namespace CAL
@@ -27,10 +26,11 @@ class Event
     Event(EventType type, StringView name) : type(type), name(name) {}
     virtual ~Event() {}
 
-    bool handled{ false };
-
     inline EventType getType() const { return type; }
     inline StringView getName() const { return name; }
+
+    inline void handle() { handled = true; }
+    inline bool isHandled() const { return handled; }
 
     template <class Type>
     inline Type toType() const
@@ -42,6 +42,9 @@ class Event
    protected:
     EventType type;
     String name;
+
+   private:
+    bool handled{ false };
 };
 
 class EventDispatcher
@@ -54,11 +57,10 @@ class EventDispatcher
     void addListener(EventType type, const Func& func) { listeners[type].push_back(func); }
     void dispatch(Event&& e)
     {
-        // LOG_DEBUG("Event recieved: {}", e.getName().data());
         if (listeners.find(e.getType()) == listeners.end()) return;
 
         for (auto& listener : listeners.at(e.getType()))
-            if (!e.handled) listener(e);
+            if (!e.isHandled()) listener(e);
     }
 };
 
