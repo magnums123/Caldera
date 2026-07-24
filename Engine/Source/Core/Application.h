@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "Defines.hpp"
 #include "Game/Game.hpp"
 #include "Utility/String.hpp"
@@ -20,7 +18,7 @@ struct AppInfo
 class Application
 {
    public:
-    Application(const AppInfo& appInfo, std::unique_ptr<Game> game);
+    Application(const AppInfo& appInfo, Ref<Game> game);
     ~Application();
 
     void run();
@@ -31,8 +29,8 @@ class Application
 
     bool useWindow{ true };
 
-    std::unique_ptr<Window> window{ nullptr };
-    std::unique_ptr<Game> gameInstance{ nullptr };
+    Ref<Window> window{ nullptr };
+    Ref<Game> gameInstance{ nullptr };
 };
 
 }  // namespace CAL

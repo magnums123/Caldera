@@ -14,7 +14,7 @@
 namespace CAL
 {
 
-Application::Application(const AppInfo& appInfo, std::unique_ptr<Game> game)
+Application::Application(const AppInfo& appInfo, Ref<Game> game)
     : window(nullptr), gameInstance(std::move(game)), useWindow(appInfo.useWindow)
 {
     Memory::initMemory();

@@ -1,8 +1,5 @@
 #include "Logger.hpp"
 
-#include <cmath>
-#include <cstdio>
-
 #include "Asserts.hpp"
 #include "Utility/String.hpp"
 

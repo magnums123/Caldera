@@ -1,7 +1,5 @@
 #include "Win32Window.hpp"
 
-#include <winuser.h>
-
 #include <exception>
 
 #include "Core/Asserts.hpp"
@@ -10,6 +8,7 @@
 #include "Core/Event/MouseEvents.hpp"
 #include "Core/Event/WindowEvents.hpp"
 #include "Core/Logger.hpp"
+#include "Core/Memory.hpp"
 
 #if defined(_WIN32)
 
@@ -21,10 +20,7 @@ const char* Win32Window::className = "Win32 Window Class";
 
 static EventDispatcher EventDispatcher{};
 
-std::unique_ptr<Window> Window::Create(const WindowCreateInfo& createInfo)
-{
-    return std::make_unique<Win32Window>(createInfo);
-}
+Ref<Window> Window::Create(const WindowCreateInfo& createInfo) { return CreateRef<Win32Window>(createInfo); }
 
 Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo)
 {

@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-
 #include "Core/Event/Event.hpp"
+#include "Core/Memory.hpp"
 #include "Defines.hpp"
 #include "Utility/String.hpp"
 
@@ -32,7 +30,7 @@ class Window
     virtual void close() = 0;
     virtual void update(float deltaTime) = 0;
 
-    static std::unique_ptr<Window> Create(const WindowCreateInfo& createInfo);
+    static Ref<Window> Create(const WindowCreateInfo& createInfo);
 
    protected:
     void* handle;

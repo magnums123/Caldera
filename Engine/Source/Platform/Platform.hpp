@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 
+#include "Core/Memory.hpp"
 #include "Defines.hpp"
 
 namespace CAL
@@ -23,6 +24,6 @@ class Platform
     virtual float getAbsoluteTime() const = 0;
     virtual void sleep(uint64_t ms) const = 0;
 
-    static std::unique_ptr<Platform> Create();
+    static Ref<Platform> Create();
 };
 }  // namespace CAL

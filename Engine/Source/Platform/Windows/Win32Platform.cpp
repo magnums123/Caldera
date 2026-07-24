@@ -1,6 +1,6 @@
 #include "Win32Platform.hpp"
 
-#include "Core/Logger.hpp"
+#include "Core/Memory.hpp"
 
 #if defined(_WIN32)
 
@@ -17,7 +17,7 @@ namespace CAL
 static float clockFrequency;
 static std::int64_t startTime;
 
-std::unique_ptr<Platform> Platform::Create() { return std::make_unique<Win32Platform>(Win32Platform()); }
+Ref<Platform> Platform::Create() { return CreateRef<Win32Platform>(Win32Platform()); }
 
 Win32Platform::Win32Platform()
 {

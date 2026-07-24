@@ -19,7 +19,7 @@ struct MemoryStats
     std::array<size_t, (size_t)MemoryTag::MAX_TAGS> taggedALlocations{};
 };
 
-static std::unique_ptr<Platform> platform{ nullptr };
+static Ref<Platform> platform{ nullptr };
 static MemoryStats stats{};
 
 // clang-format off
