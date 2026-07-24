@@ -3,8 +3,8 @@
 #include <Defines.hpp>
 #include <functional>
 #include <map>
-#include <vector>
 
+#include "Core/Logger.hpp"
 #include "Utility/String.hpp"
 
 namespace CAL
@@ -24,7 +24,6 @@ enum class EventType
 class Event
 {
    public:
-    // Event() = default;
     Event(EventType type, StringView name) : type(type), name(name) {}
     virtual ~Event() {}
 
@@ -36,7 +35,8 @@ class Event
     template <class Type>
     inline Type toType() const
     {
-        return dynamic_cast<Type>(this);
+        if (auto* ret = dynamic_cast<Type>(this)) return ret;
+        return {};
     }
 
    protected:
@@ -52,8 +52,9 @@ class EventDispatcher
 
    public:
     void addListener(EventType type, const Func& func) { listeners[type].push_back(func); }
-    void dispatch(Event& e)
+    void dispatch(Event&& e)
     {
+        // LOG_DEBUG("Event recieved: {}", e.getName().data());
         if (listeners.find(e.getType()) == listeners.end()) return;
 
         for (auto& listener : listeners.at(e.getType()))

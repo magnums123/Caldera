@@ -1,4 +1,4 @@
-#include "GameMemory.hpp"
+#include "Memory.hpp"
 
 #include <sys/stat.h>
 

@@ -4,9 +4,11 @@
 #include <utility>
 
 #include "Core/Event/Event.hpp"
+#include "Core/Event/KeyCodes.hpp"
+#include "Core/Event/KeyEvents.hpp"
 #include "Core/Event/WindowEvents.hpp"
-#include "Core/GameMemory.hpp"
 #include "Core/Logger.hpp"
+#include "Core/Memory.hpp"
 #include "Game/Game.hpp"
 
 namespace CAL
@@ -28,12 +30,28 @@ Application::Application(const AppInfo& appInfo, std::unique_ptr<Game> game)
         window = Window::Create(createInfo);
 
         // TEMP
-        window->dispatcher.addListener(EventType::WINDOW_CLOSED, [&](Event& e) { isRunning = false; });
+        window->dispatcher.addListener(
+            EventType::WINDOW_CLOSED,
+            [&](Event& e)
+            {
+                isRunning = false;
+                e.handled = true;
+            });
+        window->dispatcher.addListener(
+            EventType::KEY_PRESSED,
+            [&](Event& e)
+            {
+                auto re = e.toType<const KeyPressEvent*>();
+                auto keyCodeStr = re->getKeyCode();
+                LOG_INFO("Key Pressed: {}", keyCodeToString(re->getKeyCode()));
+                e.handled = true;
+            });
         window->dispatcher.addListener(
             EventType::WINDOW_RESIZED,
             [&](Event& e)
             {
                 auto re = e.toType<const WindowResizeEvent*>();
+
                 LOG_DEBUG("Window Resized. New size = ({}, {})", re->getWidth(), re->getHeight());
             });
     }
