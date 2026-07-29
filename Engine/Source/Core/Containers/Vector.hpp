@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <initializer_list>
 
+#include "Core/Asserts.hpp"
 #include "Core/Memory.hpp"
 
 namespace CAL
@@ -20,6 +21,7 @@ class Vector
     Vector() : mCapacity(defaultCapacity), mData((Ty*)allocateMemory(1 * sizeof(Ty), MemoryTag::DARRAY)) {}
     Vector(size_t size) : mSize(size), mCapacity(size), mData((Ty*)allocateMemory(size * sizeof(Ty), MemoryTag::DARRAY))
     {
+        ASSERT_MSG(size > -1, "Invalid Vector Size");
     }
     Vector(std::initializer_list<Ty> data)
         : mSize(data.size()),
@@ -41,7 +43,7 @@ class Vector
     {
         auto temp = allocateMemory(size * sizeof(Ty), MemoryTag::DARRAY);
         copyMemory(temp, mData, size * sizeof(Ty));
-        freeMemory(mData, mSize * sizeof(Ty), MemoryTag::DARRAY);
+        freeMemory(mData, (mSize - 1) * sizeof(Ty), MemoryTag::DARRAY);
         mData = (Ty*)temp;
         mSize = size;
         if (mSize > mCapacity) mCapacity = mSize;
@@ -53,9 +55,14 @@ class Vector
 
     void pushBack(Ty data)
     {
-        resize(mSize + 1);
-        copyMemory(&mData[mSize - 1], &data, sizeof(Ty));
-        // mData[mSize + 1] = data;
+        auto temp = allocateMemory((mSize + 1) * sizeof(Ty), MemoryTag::DARRAY);
+        copyMemory(temp, mData, mSize * sizeof(Ty));
+        freeMemory(mData, mSize * sizeof(Ty), MemoryTag::DARRAY);
+        mSize += 1;
+        mData = (Ty*)temp;
+        // resize(mSize + 1);
+        // copyMemory(&mData[mSize - 1], &data, sizeof(Ty));
+        mData[mSize - 1] = data;
         if (mSize > mCapacity) mCapacity = mSize;
     }
     void pop() { resize(mSize - 1); }
@@ -98,7 +105,11 @@ class Vector
         mSize -= 1;
     }
 
-    Ty& operator[](uint64_t index) const { return mData[index]; }
+    Ty& operator[](uint64_t index) const
+    {
+        ASSERT_MSG((index > -1) && (index < size()), "Invalid Index into Vector");
+        return mData[index];
+    }
 
     Ty* begin() { return mData; }
     Ty* end() { return &mData[mSize]; }

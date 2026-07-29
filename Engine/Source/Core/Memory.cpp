@@ -42,8 +42,6 @@ static std::array<String, (size_t)MemoryTag::MAX_TAGS+1> MemoryTagString
    "ENTITY           ",
    "ENTITY_NODE      ",
    "SCENE            ",
-
-   "MAX_MemoryTagString[i]S         "
 };
 // clang-format on
 
@@ -86,7 +84,7 @@ String getMemoryUsageString()
     const uint64_t gib = 1024 * 1024 * 1024;
     const uint64_t mib = 1024 * 1024;
     const uint64_t kib = 1024;
-    String usageString{ "System memory use:\n" };
+    String usageString{ "\nSystem memory use:\n" };
 
     for (size_t i = 0; i < (size_t)MemoryTag::MAX_TAGS; i++)
     {
@@ -114,7 +112,7 @@ String getMemoryUsageString()
             amount = stats.taggedALlocations[i];
         }
 
-        usageString.append(std::format("{}: {}{}\n", MemoryTagString[i], amount, unit));
+        usageString.append(std::format("\t{}: {}{}\n", MemoryTagString[i], amount, unit));
     }
     return usageString + "\n";
 }

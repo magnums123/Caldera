@@ -1,66 +1,50 @@
 #include "Application.h"
 
-#include "Core/Containers/Vector.hpp"
+#include <cstdint>
+
+#include "Core/Clock.h"
 #include "Core/Event/Event.hpp"
-#include "Core/Event/KeyCodes.hpp"
-#include "Core/Event/KeyEvents.hpp"
-#include "Core/Event/WindowEvents.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Memory.hpp"
 #include "Game/Game.hpp"
+#include "Renderer/Renderer.hpp"
 
 namespace CAL
 {
 
 Application::Application(const AppInfo& appInfo, Ref<Game> game)
-    : window(nullptr), gameInstance(std::move(game)), useWindow(appInfo.useWindow)
+    : window(nullptr),
+      gameInstance(std::move(game)),
+      platform(Platform::Create()),
+      clock(nullptr),
+      headless(appInfo.headless)
 {
     Memory::initMemory();
+    clock = CreateRef<Clock>(platform);
 
-    Vector<int> vec{ { 122, 2, 3, 4, 5, 62, 7, 8, 9, 0 } };
-    vec.resize(5);
-    vec.pop();
-    vec.pushBack(30);
-    vec.remove(0);
-    // for (auto i = 0; i < vec.size(); i++) LOG_DEBUG("{}", vec[i]);
-    for (auto i : vec) LOG_DEBUG("{}", i);
+    if (headless)
+        // Do headless configuration
+        return;
 
-    LOG_INFO("Size of 4 ints: {}", sizeof(int) * 4);
+    WindowCreateInfo createInfo{ .name = appInfo.appName, .width = appInfo.width, .height = appInfo.height };
+    window = Window::Create(createInfo);
 
-    LOG_TRACE("{}", Memory::getMemoryUsageString());
+    RendererInfo rendererInfo{ .width = appInfo.width,
+                               .height = appInfo.height,
+                               .name = appInfo.appName,
+                               .backendType = RendererBackendType::Vulkan,
+                               .platform = platform,
+                               .window = window };
+    renderer = Renderer::Create(rendererInfo);
 
-    if (useWindow)
-    {
-        WindowCreateInfo createInfo{ .name = appInfo.appName, .width = appInfo.width, .height = appInfo.height };
-        window = Window::Create(createInfo);
-
-        // TEMP
-        window->dispatcher.addListener(
-            EventType::WINDOW_CLOSED,
-            [&](Event& e)
-            {
-                isRunning = false;
-                e.handle();
-            });
-        window->dispatcher.addListener(
-            EventType::KEY_PRESSED,
-            [&](Event& e)
-            {
-                auto re = e.toType<const KeyPressEvent*>();
-                auto keyCodeStr = re->getKeyCode();
-                LOG_INFO("Key Pressed: {}", keyCodeToString(re->getKeyCode()));
-                e.handle();
-            });
-        window->dispatcher.addListener(
-            EventType::WINDOW_RESIZED,
-            [&](Event& e)
-            {
-                auto re = e.toType<const WindowResizeEvent*>();
-
-                LOG_DEBUG("Window Resized. New size = ({}, {})", re->getWidth(), re->getHeight());
-                e.handle();
-            });
-    }
+    // TEMP
+    window->dispatcher.addListener(
+        EventType::WINDOW_CLOSED,
+        [&](Event& e)
+        {
+            isRunning = false;
+            e.handle();
+        });
 
     isRunning = true;
     isSuspended = false;
@@ -70,17 +54,39 @@ Application::~Application() { Memory::shutdownMemory(); }
 
 void Application::run()
 {
+    clock->update();
+    lastTime = clock->getElapsedTime();
+
+    float runningTime{};
+    uint64_t frameCount{};
+    float targetFrameTime{ 1.f / 60.f };
+
     while (isRunning)
     {
+        window->update();
         if (!isSuspended)
         {
-            if (useWindow)
-            {
-                // isRunning = !window->shouldClose();
-                window->update(0);
-                gameInstance->update(0);
-                gameInstance->render();
-            }
+            clock->update();
+            float currentTime{ clock->getElapsedTime() };
+            float deltaTime{ currentTime - lastTime };
+            float frameStartTime{ platform->getAbsoluteTime() };
+
+            gameInstance->update(deltaTime);
+            gameInstance->render(deltaTime);
+
+            RenderPacket packet{ deltaTime };
+            renderer->drawFrame(packet);
+
+            float frameEndTime{ platform->getAbsoluteTime() };
+            float frameTime{ frameEndTime - frameStartTime };
+            runningTime += frameTime;
+            float remainingSeconds{ targetFrameTime - frameTime };
+
+            bool limitFrames{ false };
+            if (remainingSeconds > 0 && limitFrames) platform->sleep((remainingSeconds * 1000) - 1);
+            frameCount += 1;
+
+            lastTime = currentTime;
         }
     }
 }

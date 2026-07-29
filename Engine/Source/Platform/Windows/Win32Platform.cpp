@@ -4,7 +4,12 @@
 
 #if defined(_WIN32)
 
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 
 #include <cstdint>
@@ -34,6 +39,8 @@ void Win32Platform::freeMemory(void* block, bool aligned) const { free(block); }
 void* Win32Platform::zeroMemory(void* block, size_t size) const { return setMemory(block, 0, size); }
 void Win32Platform::copyMemory(void* dst, void* src, size_t size) const { memcpy(dst, src, size); }
 void* Win32Platform::setMemory(void* dst, std::int32_t value, size_t size) const { return memset(dst, value, size); }
+
+StringView Win32Platform::getRequiredExtensions() { return vk::KHRWin32SurfaceExtensionName; }
 
 float Win32Platform::getAbsoluteTime() const
 {

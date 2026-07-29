@@ -31,8 +31,8 @@ Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo
         CW_USEDEFAULT, nullptr, nullptr, hInstance, this);
 
     ASSERT_MSG(handle, "Failed to create Win32 Window.");
+    internalState = hInstance;
     ShowWindow((HWND)handle, SW_SHOW);
-    LOG_DEBUG("Succesfully created Win32Window.");
 };
 
 void Win32Window::registerClass()
@@ -57,7 +57,6 @@ void Win32Window::registerClass()
     }
 
     classRegistered = true;
-    LOG_DEBUG("Succesfully registered Window Class.");
 }
 
 Win32Window::~Win32Window()
@@ -79,7 +78,7 @@ void Win32Window::close()
     closeRequested = true;
 }
 
-void Win32Window::update(float deltaTime)
+void Win32Window::update()
 {
     MSG msg{};
     while (PeekMessage(&msg, (HWND)handle, 0, 0, PM_REMOVE))

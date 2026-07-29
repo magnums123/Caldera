@@ -10,4 +10,4 @@ SandboxGame::~SandboxGame() {}
 
 void SandboxGame::update(float deltaTime) {}
 
-void SandboxGame::render() {}
+void SandboxGame::render(float deltaTime) {}

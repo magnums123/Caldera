@@ -8,8 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Find Vulkan SDK
-find_package(Vulkan REQUIRED)
+# find_package(Vulkan REQUIRED)
 
 # Include subdirectories
+add_subdirectory(Thirdparty)
 add_subdirectory(Engine)
 add_subdirectory(Sandbox)

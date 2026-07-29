@@ -8,14 +8,14 @@ namespace CAL
 {
 
 extern std::unique_ptr<Game> createGame();
-
+}
 int main()
 {
-    AppInfo appInfo{ "Caldera Engine", 1280, 720, true };
+    CAL::AppInfo appInfo{ "Caldera Engine", 1280, 720, false };
 
     try
     {
-        Application app{ appInfo, createGame() };
+        CAL::Application app{ appInfo, CAL::createGame() };
         app.run();
     }
     catch (const std::exception& e)
@@ -33,4 +33,3 @@ int main()
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) { return main(); }
 
 #endif
-}  // namespace CAL

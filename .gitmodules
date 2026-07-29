@@ -1,0 +1,9 @@
+[submodule "Thirdparty/VulkanMemoryAllocator"]
+	path = Thirdparty/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "Thirdparty/Vulkan-Headers"]
+	path = Thirdparty/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "Thirdparty/Vulkan-Loader"]
+	path = Thirdparty/Vulkan-Loader
+	url = https://github.com/KhronosGroup/Vulkan-Loader.git

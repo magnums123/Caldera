@@ -24,16 +24,18 @@ class Window
     inline uint32_t getWidth() const { return width; }
     inline uint32_t getHeight() const { return height; }
     inline void* getHandle() const { return handle; }
+    inline void* getInternalState() const { return internalState; }
 
     virtual void toggleFullscreen() = 0;
     virtual bool shouldClose() = 0;
     virtual void close() = 0;
-    virtual void update(float deltaTime) = 0;
+    virtual void update() = 0;
 
     static Ref<Window> Create(const WindowCreateInfo& createInfo);
 
    protected:
     void* handle;
+    void* internalState;
     uint32_t width, height;
 };
 }  // namespace CAL

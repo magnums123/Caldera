@@ -9,5 +9,5 @@ class SandboxGame : public CAL::Game
     ~SandboxGame() override;
 
     void update(float deltaTime) override;
-    void render() override;
+    void render(float deltaTime) override;
 };

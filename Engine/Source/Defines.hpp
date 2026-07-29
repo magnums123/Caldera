@@ -1,3 +1,15 @@
 #pragma once
 
 #include "engine_export.h"
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX  // Prevents min() and max() macro conflicts as well
+#endif
+
+#define VK_USE_PLATFORM_WIN32_KHR
+#define VULKAN_HPP_NO_CONSTRUCTORS
+#include <vulkan/vulkan.hpp>

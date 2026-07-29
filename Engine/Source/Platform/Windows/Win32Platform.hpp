@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "Utility/String.hpp"
 #if defined(_WIN32)
 // clang-format off
 // clang-format on
@@ -19,6 +20,8 @@ class Win32Platform : public Platform
     void* zeroMemory(void* block, size_t size) const override;
     void copyMemory(void* dst, void* src, size_t size) const override;
     void* setMemory(void* dst, std::int32_t value, size_t size) const override;
+
+    StringView getRequiredExtensions() override;
 
     float getAbsoluteTime() const override;
     void sleep(uint64_t ms) const override;

@@ -16,9 +16,18 @@ generate_export_header(Engine
 target_include_directories(Engine PUBLIC 
     # Points to "Engine/Source" so Sandbox can do #include <Core.hpp> or #include "Core.hpp"
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/VulkanMemoryAllocator/include
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/Vulkan-Headers/include 
     
     # Points to "build/Engine" so anyone including Engine files can resolve #include "engine_export.h"
     ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_link_directories(Engine PRIVATE
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/Vulkan-Loader/lib 
 )
 
 target_compile_definitions(Engine
@@ -30,4 +39,4 @@ target_compile_definitions(Engine
 )
 
 # Link Vulkan
-target_link_libraries(Engine PUBLIC Vulkan::Vulkan)
+target_link_libraries(Engine PRIVATE vulkan Vulkan::Headers GPUOpen::VulkanMemoryAllocator)

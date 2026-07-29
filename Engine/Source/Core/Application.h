@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Defines.hpp"
+#include <Defines.hpp>
+
+#include "Core/Clock.h"
 #include "Game/Game.hpp"
+#include "Renderer/Renderer.hpp"
 #include "Utility/String.hpp"
 #include "Window/Window.hpp"
 
@@ -12,7 +15,7 @@ struct AppInfo
 {
     String appName;
     uint32_t width, height;
-    bool useWindow;
+    bool headless;
 };
 
 class Application
@@ -24,13 +27,17 @@ class Application
     void run();
 
    private:
+    float lastTime;
     bool isRunning{ false };
     bool isSuspended{ false };
 
-    bool useWindow{ true };
+    bool headless{ false };
 
+    Ref<Platform> platform{ nullptr };
+    Ref<Clock> clock{ nullptr };
     Ref<Window> window{ nullptr };
     Ref<Game> gameInstance{ nullptr };
+    Ref<Renderer> renderer{ nullptr };
 };
 
 }  // namespace CAL
