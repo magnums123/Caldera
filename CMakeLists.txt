@@ -12,5 +12,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Include subdirectories
 add_subdirectory(Thirdparty)
-add_subdirectory(Engine)
+add_subdirectory(Caldera)
 add_subdirectory(Sandbox)
