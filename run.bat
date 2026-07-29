@@ -12,7 +12,7 @@ if %ERRORLEVEL% neq 0 (
     exit /b %ERRORLEVEL%
 )
 
-cmake --build build --config %BUILD_TYPE% --target Sandbox Engine
+cmake --build build --config %BUILD_TYPE% --target Sandbox Caldera
 
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Build failed! Unable to run Sandbox.

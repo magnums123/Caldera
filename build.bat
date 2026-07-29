@@ -35,7 +35,7 @@ if "%target_choice%"=="1" (
 ) else if "%target_choice%"=="2" (
     set TARGET=--target Sandbox
 ) else if "%target_choice%"=="3" (
-    set TARGET=--target Engine
+    set TARGET=--target Caldera
 ) else (
     echo Invalid choice. Building entire project.
     set TARGET=

@@ -5,7 +5,7 @@ file(GLOB_RECURSE SANDBOX_SOURCES "Source/*.cpp" "Source/*.hpp" "Source/*.h")
 add_executable(Sandbox ${SANDBOX_SOURCES})
 
 # Link against our Engine library
-target_link_libraries(Sandbox PRIVATE Engine)
+target_link_libraries(Sandbox PRIVATE Caldera)
 
 target_compile_definitions(Sandbox
     PRIVATE
@@ -17,7 +17,7 @@ target_compile_definitions(Sandbox
 
 add_custom_command(TARGET Sandbox POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      $<TARGET_FILE:Engine>
+    $<TARGET_FILE:Caldera>
       $<TARGET_FILE_DIR:Sandbox>
     COMMENT "Copying Engine DLL to Sandbox output directory..."
   )
