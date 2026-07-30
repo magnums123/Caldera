@@ -20,13 +20,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
     ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/Vulkan-Headers/include 
     
-    # Points to "build/Caldera" so anyone including Caldera files can resolve #include "engine_export.h"
+    # Points to "build/Caldera" so anyone including Caldera files can resolve #include "${PROJECT_NAME}_export.h"
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Using SYSTEM PRIVATE removes the warnings cluttering the logs
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/VulkanMemoryAllocator/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/VulkanMemoryAllocator-Hpp/include
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE
@@ -43,4 +43,4 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 # Link Vulkan
-target_link_libraries(${PROJECT_NAME} PRIVATE vulkan Vulkan::Headers GPUOpen::VulkanMemoryAllocator)
+target_link_libraries(${PROJECT_NAME} PRIVATE vulkan Vulkan::Headers VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp)

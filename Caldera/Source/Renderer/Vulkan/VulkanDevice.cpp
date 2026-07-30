@@ -1,5 +1,7 @@
 #include "Renderer/Vulkan/VulkanDevice.hpp"
 
+#include <set>
+
 #include "Core/Asserts.hpp"
 #include "Core/Containers/Vector.hpp"
 #include "Core/Logger.hpp"
@@ -9,7 +11,10 @@
 
 namespace CAL
 {
-void VulkanDevice::init(const VulkanContext& context)
+
+// #include <vulkan/vulkan_win32.h>
+
+void VulkanDevice::init(VulkanContext& context)
 {
     auto physicalDevices = context.instance.enumeratePhysicalDevices();
 
@@ -28,48 +33,83 @@ void VulkanDevice::init(const VulkanContext& context)
 
     auto queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
 
-    for (size_t i = 0; i < queueFamilyProperties.size(); i++)
+    // First pass: Find dedicated or optimal queues
+    for (uint32_t i = 0; i < queueFamilyProperties.size(); i++)
     {
-        if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics)
+        const auto& flags = queueFamilyProperties[i].queueFlags;
+
+        // Check Graphics & Present support
+        if (flags & vk::QueueFlagBits::eGraphics)
         {
-            if (physicalDevice.getSurfaceSupportKHR(i, context.surface)) queueFamilyIndices.graphicsFamily = i;
+            if (!context.queueFamilyIndices.graphicsFamily.has_value()) context.queueFamilyIndices.graphicsFamily = i;
+
+            if (physicalDevice.getSurfaceSupportKHR(i, context.surface))
+            {
+                if (!context.queueFamilyIndices.presentFamily.has_value()) context.queueFamilyIndices.presentFamily = i;
+            }
         }
-        if ((queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eCompute) &&
-            !(!!(queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics) ||
-              !!(queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eTransfer)))
-            queueFamilyIndices.computeFamily = i;
-        if ((queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eTransfer) &&
-            !(!!(queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics) ||
-              !!(queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eCompute)))
-            queueFamilyIndices.transferFamily = i;
+
+        // Try finding a dedicated compute queue (Compute without Graphics)
+        if ((flags & vk::QueueFlagBits::eCompute) && !(flags & vk::QueueFlagBits::eGraphics))
+        {
+            context.queueFamilyIndices.computeFamily = i;
+        }
+
+        // Try finding a dedicated transfer queue (Transfer without Graphics or Compute)
+        if ((flags & vk::QueueFlagBits::eTransfer) && !(flags & vk::QueueFlagBits::eGraphics) &&
+            !(flags & vk::QueueFlagBits::eCompute))
+        {
+            context.queueFamilyIndices.transferFamily = i;
+        }
     }
 
-    if (queueFamilyIndices.graphicsFamily.has_value() && !queueFamilyIndices.isComplete())
+    // Second pass: Fallbacks if dedicated queues were not found
+    if (!context.queueFamilyIndices.computeFamily.has_value())
     {
-        if (!queueFamilyIndices.presentFamily.has_value())
-            queueFamilyIndices.presentFamily = queueFamilyIndices.graphicsFamily;
-        if (!queueFamilyIndices.computeFamily.has_value())
-            queueFamilyIndices.computeFamily = queueFamilyIndices.graphicsFamily;
-        if (!queueFamilyIndices.transferFamily.has_value())
-            queueFamilyIndices.transferFamily = queueFamilyIndices.graphicsFamily;
-        LOG_WARN("Unique Compute or Transfer Queue not found");
+        // Any queue with compute capability
+        for (uint32_t i = 0; i < queueFamilyProperties.size(); i++)
+        {
+            if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eCompute)
+            {
+                context.queueFamilyIndices.computeFamily = i;
+                break;
+            }
+        }
     }
 
-    ASSERT_MSG(queueFamilyIndices.isComplete(), "Invalid Queue Family Indices");
-
-    float queuePriorities{ 1.f };
-
-    // clang-format off
-    Vector<vk::DeviceQueueCreateInfo> queueCreateInfos
+    if (!context.queueFamilyIndices.transferFamily.has_value())
     {
-         vk::DeviceQueueCreateInfo{ .queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(), .queueCount = 1, .pQueuePriorities = &queuePriorities },
-         vk::DeviceQueueCreateInfo{ .queueFamilyIndex = queueFamilyIndices.presentFamily.value(), .queueCount = 1, .pQueuePriorities = &queuePriorities },
-         vk::DeviceQueueCreateInfo{ .queueFamilyIndex = queueFamilyIndices.computeFamily.value(), .queueCount = 1, .pQueuePriorities = &queuePriorities },
-         vk::DeviceQueueCreateInfo{ .queueFamilyIndex = queueFamilyIndices.transferFamily.value(), .queueCount = 1, .pQueuePriorities = &queuePriorities}
-    };
-    // clang-format on
+        // Any queue with transfer capability (graphics & compute queues implicitly support transfer)
+        for (uint32_t i = 0; i < queueFamilyProperties.size(); i++)
+        {
+            if (queueFamilyProperties[i].queueFlags &
+                (vk::QueueFlagBits::eTransfer | vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eCompute))
+            {
+                context.queueFamilyIndices.transferFamily = i;
+                break;
+            }
+        }
+    }
 
-    Vector<const char*> extensions{ vk::KHRSwapchainExtensionName };
+    ASSERT_MSG(context.queueFamilyIndices.isComplete(), "Failed to find all required queue families!");
+
+    // 2. Deduplicate indices to build valid vk::DeviceQueueCreateInfo structs
+    std::set<uint32_t> uniqueQueueFamilies = { context.queueFamilyIndices.graphicsFamily.value(),
+                                               context.queueFamilyIndices.presentFamily.value(),
+                                               context.queueFamilyIndices.computeFamily.value(),
+                                               context.queueFamilyIndices.transferFamily.value() };
+
+    float queuePriority = 1.0f;
+    Vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+
+    for (uint32_t queueFamily : uniqueQueueFamilies)
+    {
+        queueCreateInfos.pushBack(
+            vk::DeviceQueueCreateInfo{
+                .queueFamilyIndex = queueFamily, .queueCount = 1, .pQueuePriorities = &queuePriority });
+    }
+
+    Vector<const char*> extensions{ vk::KHRSwapchainExtensionName, vk::KHRExternalMemoryWin32ExtensionName };
 
     vk::StructureChain<
         vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan11Features, vk::PhysicalDeviceVulkan12Features,
@@ -94,10 +134,5 @@ void VulkanDevice::init(const VulkanContext& context)
     };
 
     logicalDevice = physicalDevice.createDevice(deviceCreateInfo, context.allocator);
-
-    graphicsQueue = logicalDevice.getQueue(queueFamilyIndices.graphicsFamily.value(), 0);
-    presentQueue = logicalDevice.getQueue(queueFamilyIndices.presentFamily.value(), 0);
-    computeQueue = logicalDevice.getQueue(queueFamilyIndices.computeFamily.value(), 0);
-    transferQueue = logicalDevice.getQueue(queueFamilyIndices.transferFamily.value(), 0);
 }
 }  // namespace CAL
