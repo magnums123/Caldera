@@ -1,15 +1,21 @@
 #include "VulkanRenderer.hpp"
 
 #include <exception>
+#include <vk_mem_alloc_enums.hpp>
+#include <vk_mem_alloc_funcs.hpp>
 #include <vk_mem_alloc_structs.hpp>
 
+#include "Core/Asserts.hpp"
 #include "Core/Containers/Vector.hpp"
 #include "Core/Logger.hpp"
+#include "Core/Memory.hpp"
 #include "Renderer/Renderer.hpp"
-#include "Renderer/Vulkan/VulkanDevice.hpp"
+#include "Renderer/Vulkan/Structures/VulkanDevice.hpp"
+#include "Renderer/Vulkan/Structures/VulkanSwapchain.hpp"
 #include "Renderer/Vulkan/VulkanPlatform.hpp"
 #include "Renderer/Vulkan/VulkanTypes.hpp"
 #include "Utility/String.hpp"
+#include "vulkan/vulkan.hpp"
 
 // Add this macro definition in EXACTLY ONE .cpp file in your project:
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
@@ -46,31 +52,33 @@ VulkanRenderer::VulkanRenderer(const RendererInfo& rendererInfo) : Renderer(rend
     context.instance = vk::createInstance(instanceCreateInfo, context.allocator);
     vk::detail::defaultDispatchLoaderDynamic.init(context.instance);
 
+    ASSERT(context.instance != nullptr);
+
     context.surface = platformCreateVulkanSurface(context, rendererInfo);
 
-    context.device.init(context);
+    context.device = CreateRef<VulkanDevice>(MemoryTag::RENDERER, context);
 
     vk::detail::defaultDispatchLoaderDynamic.init(
-        context.instance, vkGetInstanceProcAddr, context.device.logicalDevice, vkGetDeviceProcAddr);
-
-    context.graphicsQueue = context.device.logicalDevice.getQueue(context.queueFamilyIndices.graphicsFamily.value(), 0);
-    context.presentQueue = context.device.logicalDevice.getQueue(context.queueFamilyIndices.presentFamily.value(), 0);
-    context.computeQueue = context.device.logicalDevice.getQueue(context.queueFamilyIndices.computeFamily.value(), 0);
-    context.transferQueue = context.device.logicalDevice.getQueue(context.queueFamilyIndices.transferFamily.value(), 0);
+        context.instance, vkGetInstanceProcAddr, context.device->logicalDevice, vkGetDeviceProcAddr);
 
     vma::VulkanFunctions vkFunctions = vma::functionsFromDispatcher();
-    vma::AllocationCreateInfo allocatorCreateInfo{
-        // .flags
+    vma::AllocatorCreateInfo allocatorCreateInfo{
+        .flags = vma::AllocatorCreateFlagBits::eBufferDeviceAddress,
+        .physicalDevice = context.device->physicalDevice,
+        .device = context.device->logicalDevice,
+        .pVulkanFunctions = &vkFunctions,
+        .instance = context.instance,
     };
+
+    context.vmaAllocator = vma::createAllocator(allocatorCreateInfo);
+
+    context.swapchain =
+        CreateRef<VulkanSwapchain>(MemoryTag::RENDERER, context, rendererInfo.width, rendererInfo.height);
 
     LOG_DEBUG("Initializing Vulkan Renderer");
 }
 
-VulkanRenderer::~VulkanRenderer()
-{
-    // context.instance.destroySurfaceKHR(context.surface);
-    context.device = {};
-}
+VulkanRenderer::~VulkanRenderer() { context.device = {}; }
 
 void VulkanRenderer::drawFrame(const RenderPacket& renderPacket)
 {

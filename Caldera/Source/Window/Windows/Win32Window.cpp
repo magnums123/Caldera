@@ -1,5 +1,7 @@
 #include "Win32Window.hpp"
 
+#include <winuser.h>
+
 #include <exception>
 
 #include "Core/Asserts.hpp"
@@ -20,7 +22,10 @@ const char* Win32Window::className = "Win32 Window Class";
 
 static EventDispatcher EventDispatcher{};
 
-Ref<Window> Window::Create(const WindowCreateInfo& createInfo) { return CreateRef<Win32Window>(createInfo); }
+Ref<Window> Window::Create(const WindowCreateInfo& createInfo)
+{
+    return CreateRef<Win32Window>(Memory::MemoryTag::APPLICATION, createInfo);
+}
 
 Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo)
 {
@@ -37,7 +42,7 @@ Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo
 
 void Win32Window::registerClass()
 {
-    HICON icon{ LoadIcon(hInstance, IDI_APPLICATION) };
+    HICON icon{ LoadIcon(hInstance, IDI_WINLOGO) };
     // Using nullptr in place of the hInstance in the LoadCursor function tells the OS that we want to manage the cursur
     // ourselfs Thus allowing to use the specified cursor type instead of the default Arrow
     HCURSOR cursor{ LoadCursor(nullptr, IDC_ARROW) };
@@ -74,8 +79,8 @@ bool Win32Window::shouldClose() { return closeRequested; }
 
 void Win32Window::close()
 {
-    PostQuitMessage(0);
     closeRequested = true;
+    PostQuitMessage(0);
 }
 
 void Win32Window::update()
@@ -103,19 +108,16 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
     switch (uMsg)
     {
         case WM_ERASEBKGND:
-            // 1 specifically tells the os that this will be handled by the app(read docs)
-            return 1;
-        // case WM_CLOSE:
-        //     // TODO: Fire an event to tell Application a Window was closed
-        //     if (window) window->close();
-        //     return 0;
+            return 1;  // 1 specifically tells the os that this will be handled by the app(read docs)
+        case WM_CLOSE:
+            window->dispatcher.dispatch(WindowCloseEvent{});
+            if (window) window->close();
+            return 0;
         case WM_DESTROY:
         {
             window->dispatcher.dispatch(WindowCloseEvent{});
 
             if (window) window->close();
-
-            // PostQuitMessage(0);
             return 0;
         }
         case WM_SIZE:
@@ -176,14 +178,12 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
             {
                 case WM_LBUTTONDOWN:
                 {
-                    MouseButtonPressEvent e{ MouseButton::Left };
-                    // window->dispatcher.dispatch(e);
+                    window->dispatcher.dispatch(MouseButtonPressEvent{ MouseButton::Left });
                 }
                 break;
                 case WM_MBUTTONDOWN:
                 {
-                    MouseButtonPressEvent e{ MouseButton::Middle };
-                    // window->dispatcher.dispatch(e);
+                    window->dispatcher.dispatch(MouseButtonPressEvent{ MouseButton::Middle });
                 }
                 break;
                 case WM_RBUTTONDOWN:

@@ -20,7 +20,7 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
       headless(appInfo.headless)
 {
     Memory::initMemory();
-    clock = CreateRef<Clock>(platform);
+    clock = CreateRef<Clock>(Memory::MemoryTag::APPLICATION, platform);
 
     if (headless)
         // Do headless configuration
@@ -60,6 +60,8 @@ void Application::run()
     float runningTime{};
     uint64_t frameCount{};
     float targetFrameTime{ 1.f / 60.f };
+
+    // LOG_DEBUG("{}", Memory::getMemoryUsageString());
 
     while (isRunning)
     {

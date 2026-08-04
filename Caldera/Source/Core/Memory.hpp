@@ -1,22 +1,16 @@
 #pragma once
 
 #include <Defines.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 #include "Utility/String.hpp"
 
 namespace CAL
 {
 
-template <class Ty>
-using Ref = std::shared_ptr<Ty>;
-
-template <typename Ty, typename... Args>
-constexpr Ref<Ty> CreateRef(Args&&... args)
-{
-    return std::make_shared<Ty>(std::forward<Args>(args)...);
-}
 // class Ref
 // {
 //    public:
@@ -65,4 +59,37 @@ void* setMemory(void* dst, std::int32_t value, size_t size);
 
 String getMemoryUsageString();
 }  // namespace Memory
+
+template <class Ty>
+using Ref = std::shared_ptr<Ty>;
+
+template <class Ty>
+class Allocator
+{
+   private:
+    Memory::MemoryTag tag{ Memory::MemoryTag::UNKNOWN };
+
+   public:
+    typedef Ty value_type;
+
+    Allocator(Memory::MemoryTag tag) : tag(tag) {}
+
+    Memory::MemoryTag getTag() const noexcept { return tag; }
+
+    template <class U>
+    constexpr Allocator(const Allocator<U>& other) noexcept : tag(other.getTag())
+    {
+    }
+
+    Ty* allocate(std::size_t n) noexcept { return (Ty*)Memory::allocateMemory(n * sizeof(Ty), tag); }
+
+    void deallocate(Ty* p, std::size_t n) noexcept { Memory::freeMemory(p, n * sizeof(Ty), tag); }
+};
+
+template <typename Ty, typename... Args>
+constexpr Ref<Ty> CreateRef(Memory::MemoryTag tag, Args&&... args)
+{
+    return std::allocate_shared<Ty>(Allocator<Ty>(tag), std::forward<Args>(args)...);
+}
+
 }  // namespace CAL

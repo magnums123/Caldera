@@ -1,5 +1,6 @@
-#include "Renderer/Vulkan/VulkanDevice.hpp"
+#include "Renderer/Vulkan/Structures/VulkanDevice.hpp"
 
+#include <Renderer/Vulkan/VulkanTypes.hpp>
 #include <set>
 
 #include "Core/Asserts.hpp"
@@ -12,11 +13,10 @@
 namespace CAL
 {
 
-// #include <vulkan/vulkan_win32.h>
-
-void VulkanDevice::init(VulkanContext& context)
+VulkanDevice::VulkanDevice(const VulkanContext& context)
 {
     auto physicalDevices = context.instance.enumeratePhysicalDevices();
+    ASSERT_MSG(physicalDevices.size() != 0, "No GPUs capable of running Vulkan found");
 
     for (auto device : physicalDevices)
     {
@@ -29,6 +29,19 @@ void VulkanDevice::init(VulkanContext& context)
     }
 
     if (!physicalDevice) physicalDevice = std::move(physicalDevices[0]);
+
+    features = physicalDevice.getFeatures();
+    properties = physicalDevice.getProperties();
+    memoryProperties = physicalDevice.getMemoryProperties();
+
+    swapchainInfo.surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(context.surface);
+
+    for (auto format : physicalDevice.getSurfaceFormatsKHR(context.surface))
+        swapchainInfo.surfaceFormats.pushBack(format);
+
+    for (auto presentMode : physicalDevice.getSurfacePresentModesKHR(context.surface))
+        swapchainInfo.presentModes.pushBack(presentMode);
+
     LOG_DEBUG("Selected Physical Device: {}", physicalDevice.getProperties().deviceName.data());
 
     auto queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
@@ -41,43 +54,43 @@ void VulkanDevice::init(VulkanContext& context)
         // Check Graphics & Present support
         if (flags & vk::QueueFlagBits::eGraphics)
         {
-            if (!context.queueFamilyIndices.graphicsFamily.has_value()) context.queueFamilyIndices.graphicsFamily = i;
+            if (!queueFamilyIndices.graphicsFamily.has_value()) queueFamilyIndices.graphicsFamily = i;
 
             if (physicalDevice.getSurfaceSupportKHR(i, context.surface))
             {
-                if (!context.queueFamilyIndices.presentFamily.has_value()) context.queueFamilyIndices.presentFamily = i;
+                if (!queueFamilyIndices.presentFamily.has_value()) queueFamilyIndices.presentFamily = i;
             }
         }
 
         // Try finding a dedicated compute queue (Compute without Graphics)
         if ((flags & vk::QueueFlagBits::eCompute) && !(flags & vk::QueueFlagBits::eGraphics))
         {
-            context.queueFamilyIndices.computeFamily = i;
+            queueFamilyIndices.computeFamily = i;
         }
 
         // Try finding a dedicated transfer queue (Transfer without Graphics or Compute)
         if ((flags & vk::QueueFlagBits::eTransfer) && !(flags & vk::QueueFlagBits::eGraphics) &&
             !(flags & vk::QueueFlagBits::eCompute))
         {
-            context.queueFamilyIndices.transferFamily = i;
+            queueFamilyIndices.transferFamily = i;
         }
     }
 
     // Second pass: Fallbacks if dedicated queues were not found
-    if (!context.queueFamilyIndices.computeFamily.has_value())
+    if (!queueFamilyIndices.computeFamily.has_value())
     {
         // Any queue with compute capability
         for (uint32_t i = 0; i < queueFamilyProperties.size(); i++)
         {
             if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eCompute)
             {
-                context.queueFamilyIndices.computeFamily = i;
+                queueFamilyIndices.computeFamily = i;
                 break;
             }
         }
     }
 
-    if (!context.queueFamilyIndices.transferFamily.has_value())
+    if (!queueFamilyIndices.transferFamily.has_value())
     {
         // Any queue with transfer capability (graphics & compute queues implicitly support transfer)
         for (uint32_t i = 0; i < queueFamilyProperties.size(); i++)
@@ -85,19 +98,19 @@ void VulkanDevice::init(VulkanContext& context)
             if (queueFamilyProperties[i].queueFlags &
                 (vk::QueueFlagBits::eTransfer | vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eCompute))
             {
-                context.queueFamilyIndices.transferFamily = i;
+                queueFamilyIndices.transferFamily = i;
                 break;
             }
         }
     }
 
-    ASSERT_MSG(context.queueFamilyIndices.isComplete(), "Failed to find all required queue families!");
+    ASSERT_MSG(queueFamilyIndices.isComplete(), "Failed to find all required queue families!");
 
     // 2. Deduplicate indices to build valid vk::DeviceQueueCreateInfo structs
-    std::set<uint32_t> uniqueQueueFamilies = { context.queueFamilyIndices.graphicsFamily.value(),
-                                               context.queueFamilyIndices.presentFamily.value(),
-                                               context.queueFamilyIndices.computeFamily.value(),
-                                               context.queueFamilyIndices.transferFamily.value() };
+    std::set<uint32_t> uniqueQueueFamilies = { queueFamilyIndices.graphicsFamily.value(),
+                                               queueFamilyIndices.presentFamily.value(),
+                                               queueFamilyIndices.computeFamily.value(),
+                                               queueFamilyIndices.transferFamily.value() };
 
     float queuePriority = 1.0f;
     Vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -134,5 +147,13 @@ void VulkanDevice::init(VulkanContext& context)
     };
 
     logicalDevice = physicalDevice.createDevice(deviceCreateInfo, context.allocator);
+
+    graphicsQueue = logicalDevice.getQueue(queueFamilyIndices.graphicsFamily.value(), 0);
+    presentQueue = logicalDevice.getQueue(queueFamilyIndices.presentFamily.value(), 0);
+    computeQueue = logicalDevice.getQueue(queueFamilyIndices.computeFamily.value(), 0);
+    transferQueue = logicalDevice.getQueue(queueFamilyIndices.transferFamily.value(), 0);
 }
+
+VulkanDevice::~VulkanDevice() {}
+
 }  // namespace CAL

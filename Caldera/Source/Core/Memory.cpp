@@ -2,9 +2,6 @@
 
 #include <sys/stat.h>
 
-#include <array>
-#include <cstddef>
-#include <cstdint>
 #include <format>
 #include <memory>
 
@@ -79,41 +76,51 @@ void copyMemory(void* dst, void* src, size_t size) { platform->copyMemory(dst, s
 
 void* setMemory(void* dst, std::int32_t value, size_t size) { return platform->setMemory(dst, value, size); }
 
-String getMemoryUsageString()
+std::pair<String, float> getUnitAndAmount(float amountInBytes)
 {
     const uint64_t gib = 1024 * 1024 * 1024;
     const uint64_t mib = 1024 * 1024;
     const uint64_t kib = 1024;
+
+    String unit{ "xiB" };
+    float amount{ 1.f };
+
+    if (amountInBytes >= gib)
+    {
+        unit[0] = 'G';
+        amount = amountInBytes / (float)gib;
+    }
+    else if (amountInBytes >= mib)
+    {
+        unit[0] = 'M';
+        amount = amountInBytes / (float)mib;
+    }
+    else if (amountInBytes >= kib)
+    {
+        unit[0] = 'K';
+        amount = amountInBytes / (float)kib;
+    }
+    else
+    {
+        unit = 'B';
+        amount = amountInBytes;
+    }
+
+    return { unit, amount };
+}
+String getMemoryUsageString()
+{
     String usageString{ "\nSystem memory use:\n" };
 
     for (size_t i = 0; i < (size_t)MemoryTag::MAX_TAGS; i++)
     {
-        String unit{ "xiB" };
-        float amount{ 1.f };
+        auto unitAndAmount{ getUnitAndAmount(stats.taggedALlocations[i]) };
 
-        if (stats.taggedALlocations[i] >= gib)
-        {
-            unit[0] = 'G';
-            amount = stats.taggedALlocations[i] / (float)gib;
-        }
-        else if (stats.taggedALlocations[i] >= mib)
-        {
-            unit[0] = 'M';
-            amount = stats.taggedALlocations[i] / (float)mib;
-        }
-        else if (stats.taggedALlocations[i] >= kib)
-        {
-            unit[0] = 'K';
-            amount = stats.taggedALlocations[i] / (float)kib;
-        }
-        else
-        {
-            unit = 'B';
-            amount = stats.taggedALlocations[i];
-        }
-
-        usageString.append(std::format("\t{}: {}{}\n", MemoryTagString[i], amount, unit));
+        usageString.append(std::format("\t{}: {}{}\n", MemoryTagString[i], unitAndAmount.second, unitAndAmount.first));
     }
+    auto unitAndAmount{ getUnitAndAmount(stats.totalAllocated) };
+    usageString.append(std::format("\tTOTAL Allocated  : {}{}", unitAndAmount.second, unitAndAmount.first));
+
     return usageString + "\n";
 }
 

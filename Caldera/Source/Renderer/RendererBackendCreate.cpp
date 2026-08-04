@@ -1,5 +1,6 @@
 #include <Defines.hpp>
 
+#include "Core/Memory.hpp"
 #include "Renderer.hpp"
 #include "Vulkan/VulkanRenderer.hpp"
 
@@ -12,7 +13,8 @@ Ref<Renderer> Renderer::Create(const RendererInfo& rendererInfo)
     {
         case RendererBackendType::Vulkan:
         {
-            return CreateRef<VulkanRenderer>(VulkanRenderer(rendererInfo));
+            return std::move(CreateRef<VulkanRenderer>(MemoryTag::RENDERER, rendererInfo));
+            // return std::move(CreateRef<VulkanRenderer>(Memory::MemoryTag::RENDERER, VulkanRenderer(rendererInfo)));
         }
         default:
             return nullptr;

@@ -22,7 +22,8 @@ namespace CAL
 static float clockFrequency;
 static std::int64_t startTime;
 
-Ref<Platform> Platform::Create() { return CreateRef<Win32Platform>(Win32Platform()); }
+Ref<Platform> Platform::Create() { return std::make_shared<Win32Platform>(); }
+// Ref<Platform> Platform::Create() { return CreateRef<Win32Platform>(Memory::MemoryTag::APPLICATION); }
 
 Win32Platform::Win32Platform()
 {
@@ -34,8 +35,8 @@ Win32Platform::Win32Platform()
 
 Win32Platform::~Win32Platform() {}
 
-void* Win32Platform::allocateMemory(size_t size, bool aligned) const { return malloc(size); }
-void Win32Platform::freeMemory(void* block, bool aligned) const { free(block); }
+void* Win32Platform::allocateMemory(size_t size, bool aligned) const { return std::malloc(size); }
+void Win32Platform::freeMemory(void* block, bool aligned) const { std::free(block); }
 void* Win32Platform::zeroMemory(void* block, size_t size) const { return setMemory(block, 0, size); }
 void Win32Platform::copyMemory(void* dst, void* src, size_t size) const { memcpy(dst, src, size); }
 void* Win32Platform::setMemory(void* dst, std::int32_t value, size_t size) const { return memset(dst, value, size); }

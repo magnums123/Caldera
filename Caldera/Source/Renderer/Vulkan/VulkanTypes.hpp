@@ -1,13 +1,25 @@
 #pragma once
 
 #include <Defines.hpp>
+#include <cstdint>
 #include <vk_mem_alloc.hpp>
-#include <vk_mem_alloc_handles.hpp>
 
-#include "VulkanDevice.hpp"
+#include "Core/Containers/Vector.hpp"
+#include "Core/Memory.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace CAL
 {
+struct VulkanDevice;
+struct VulkanSwapchain;
+
+struct VulkanSwapchainInfo
+{
+    vk::SurfaceCapabilitiesKHR surfaceCapabilities{};
+    Vector<vk::SurfaceFormatKHR> surfaceFormats{};
+    Vector<vk::PresentModeKHR> presentModes{};
+};
+
 struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
@@ -28,17 +40,11 @@ struct VulkanContext
     vk::AllocationCallbacks* allocator{ nullptr };
     vk::Instance instance{ nullptr };
     vk::SurfaceKHR surface{ nullptr };
-    VulkanDevice device;
-
-    QueueFamilyIndices queueFamilyIndices;
-    vk::Queue graphicsQueue{ nullptr };
-    vk::Queue presentQueue{ nullptr };
-    vk::Queue computeQueue{ nullptr };
-    vk::Queue transferQueue{ nullptr };
+    Ref<VulkanDevice> device{ nullptr };
 
     vma::Allocator vmaAllocator{ nullptr };
 
-    ~VulkanContext() { instance.destroySurfaceKHR(); }
+    Ref<VulkanSwapchain> swapchain{};
 };
 
 }  // namespace CAL
