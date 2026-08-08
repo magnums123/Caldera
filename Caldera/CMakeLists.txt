@@ -19,6 +19,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
 
     ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/Vulkan-Headers/include 
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/rtm/includes 
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Thirdparty/tinyobjloader 
     
     # Points to "build/Caldera" so anyone including Caldera files can resolve #include "${PROJECT_NAME}_export.h"
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -42,5 +46,4 @@ target_compile_definitions(${PROJECT_NAME}
         $<$<CONFIG:MinSizeRel>:NDEBUG RELEASE>
 )
 
-# Link Vulkan
 target_link_libraries(${PROJECT_NAME} PRIVATE vulkan Vulkan::Headers VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp)

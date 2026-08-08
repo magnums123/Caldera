@@ -4,9 +4,9 @@
 #include <cstdint>
 
 #include "Core/Memory.hpp"
-#include "Platform/Platform.hpp"
+#include "Renderer/Structures/Buffer.hpp"
+#include "RendererTypes.hpp"
 #include "Utility/String.hpp"
-#include "Window/Window.hpp"
 
 namespace CAL
 {
@@ -17,24 +17,10 @@ enum class RendererBackendType
     DirectX
 };
 
-struct RenderPacket
-{
-    float deltaTime;
-};
-
-struct RendererInfo
-{
-    uint32_t width, height;
-    StringView name;
-    RendererBackendType backendType;
-    Ref<Platform>& platform;
-    Ref<Window>& window;
-};
-
 class Renderer
 {
    public:
-    Renderer(const RendererInfo& rendererInfo) {}
+    Renderer(const RendererInfo& rendererInfo) : width(rendererInfo.width), height(rendererInfo.height) {}
     virtual ~Renderer() = default;
 
     inline uint32_t getWidth() const { return width; }
@@ -42,6 +28,9 @@ class Renderer
 
     virtual void drawFrame(const RenderPacket& packet) = 0;
     virtual void resize(uint32_t width, uint32_t height) = 0;
+
+    virtual Ref<Buffer> createVertexBuffer(void* data, size_t vertexCount) = 0;
+    virtual Ref<Buffer> createIndexBuffer(void* data, size_t indexCount) = 0;
 
     static Ref<Renderer> Create(const RendererInfo& rendererInfo);
 

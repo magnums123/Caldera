@@ -7,3 +7,9 @@
 [submodule "Thirdparty/VulkanMemoryAllocator-Hpp"]
 	path = Thirdparty/VulkanMemoryAllocator-Hpp
 	url = https://github.com/YaaZ/VulkanMemoryAllocator-Hpp.git
+[submodule "Thirdparty/rtm"]
+	path = Thirdparty/rtm
+	url = git@github.com:nfrechette/rtm.git
+[submodule "Thirdparty/tinyobjloader"]
+	path = Thirdparty/tinyobjloader
+	url = git@github.com:tinyobjloader/tinyobjloader.git

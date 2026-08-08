@@ -17,6 +17,9 @@ class VulkanRenderer : public Renderer
     void drawFrame(const RenderPacket& packet) override;
     void resize(uint32_t width, uint32_t height) override;
 
+    Ref<Buffer> createVertexBuffer(void* data, size_t vertexCount) override;
+    Ref<Buffer> createIndexBuffer(void* data, size_t indexCount) override;
+
    private:
     VulkanContext context{};
     bool beginFrame(float deltaTime) override;

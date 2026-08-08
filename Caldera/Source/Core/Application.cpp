@@ -1,11 +1,15 @@
 #include "Application.h"
 
 #include <cstdint>
+#include <filesystem>
 
+#include "Core/AssetManager.hpp"
 #include "Core/Clock.h"
 #include "Core/Event/Event.hpp"
+#include "Core/Event/WindowEvents.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Memory.hpp"
+#include "Core/UUID.hpp"
 #include "Game/Game.hpp"
 #include "Renderer/Renderer.hpp"
 
@@ -36,6 +40,8 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
                                .platform = platform,
                                .window = window };
     renderer = Renderer::Create(rendererInfo);
+    assetManager = CreateRef<AssetManager>(Memory::MemoryTag::APPLICATION);
+    // gameInstance.assetManager = assetManager;
 
     // TEMP
     window->dispatcher.addListener(
@@ -45,6 +51,21 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
             isRunning = false;
             e.handle();
         });
+    window->dispatcher.addListener(
+        EventType::WINDOW_RESIZED,
+        [&](Event& e)
+        {
+            auto event = e.toType<const WindowResizeEvent*>();
+            renderer->resize(event->getWidth(), event->getHeight());
+        });
+
+    // LOG_DEBUG("Current Running Dir: {}", std::filesystem::current_path().string());
+
+    MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj", renderer);
+    MeshHandle suzanne = assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
+    assetManager->unloadMesh(suzanne);
+
+    auto mesh = assetManager->getMesh(suzanne);
 
     isRunning = true;
     isSuspended = false;
@@ -61,7 +82,7 @@ void Application::run()
     uint64_t frameCount{};
     float targetFrameTime{ 1.f / 60.f };
 
-    // LOG_DEBUG("{}", Memory::getMemoryUsageString());
+    LOG_DEBUG("{}", Memory::getMemoryUsageString());
 
     while (isRunning)
     {
@@ -76,7 +97,7 @@ void Application::run()
             gameInstance->update(deltaTime);
             gameInstance->render(deltaTime);
 
-            RenderPacket packet{ deltaTime };
+            RenderPacket packet{ .deltaTime = deltaTime, .meshes = {} };
             renderer->drawFrame(packet);
 
             float frameEndTime{ platform->getAbsoluteTime() };

@@ -20,8 +20,6 @@ bool Win32Window::classRegistered = false;
 HINSTANCE Win32Window::hInstance = GetModuleHandle(0);
 const char* Win32Window::className = "Win32 Window Class";
 
-static EventDispatcher EventDispatcher{};
-
 Ref<Window> Window::Create(const WindowCreateInfo& createInfo)
 {
     return CreateRef<Win32Window>(Memory::MemoryTag::APPLICATION, createInfo);
@@ -31,9 +29,17 @@ Win32Window::Win32Window(const WindowCreateInfo& createInfo) : Window(createInfo
 {
     if (!classRegistered) registerClass();
 
+    DWORD style = WS_OVERLAPPEDWINDOW;
+
+    RECT windowRect = { 0, 0, static_cast<LONG>(createInfo.width), static_cast<LONG>(createInfo.height) };
+    AdjustWindowRect(&windowRect, style, FALSE);
+
+    int windowWidth = windowRect.right - windowRect.left;
+    int windowHeight = windowRect.bottom - windowRect.top;
+
     handle = CreateWindowEx(
-        0, className, createInfo.name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-        CW_USEDEFAULT, nullptr, nullptr, hInstance, this);
+        0, className, createInfo.name.c_str(), style, CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight, nullptr,
+        nullptr, hInstance, this);
 
     ASSERT_MSG(handle, "Failed to create Win32 Window.");
     internalState = hInstance;
@@ -127,7 +133,7 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
             uint32_t newWidth = rect.right - rect.left;
             uint32_t newHeight = rect.bottom - rect.top;
 
-            window->dispatcher.dispatch(WindowResizeEvent{ newWidth, newHeight });
+            if (newWidth > 0 || newHeight > 0) window->dispatcher.dispatch(WindowResizeEvent{ newWidth, newHeight });
         }
         break;
         case WM_KEYDOWN:

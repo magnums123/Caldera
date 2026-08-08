@@ -6,6 +6,7 @@
 
 #include "Core/Containers/Vector.hpp"
 #include "Core/Memory.hpp"
+#include "Renderer/Vulkan/Structures/VulkanCommandBuffer.hpp"
 #include "vulkan/vulkan.hpp"
 
 namespace CAL
@@ -45,6 +46,9 @@ struct VulkanContext
     vma::Allocator vmaAllocator{ nullptr };
 
     Ref<VulkanSwapchain> swapchain{};
+
+    vk::CommandPool graphicsCommandPool{ nullptr };
+    Vector<Ref<VulkanCommandBuffer>> graphicsCommandBuffers{};
 };
 
 }  // namespace CAL

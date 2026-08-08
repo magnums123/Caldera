@@ -1,5 +1,6 @@
 #include "VulkanRenderer.hpp"
 
+#include <cstdint>
 #include <exception>
 #include <vk_mem_alloc_enums.hpp>
 #include <vk_mem_alloc_funcs.hpp>
@@ -10,6 +11,7 @@
 #include "Core/Logger.hpp"
 #include "Core/Memory.hpp"
 #include "Renderer/Renderer.hpp"
+#include "Renderer/Structures/Buffer.hpp"
 #include "Renderer/Vulkan/Structures/VulkanDevice.hpp"
 #include "Renderer/Vulkan/Structures/VulkanSwapchain.hpp"
 #include "Renderer/Vulkan/VulkanPlatform.hpp"
@@ -75,6 +77,16 @@ VulkanRenderer::VulkanRenderer(const RendererInfo& rendererInfo) : Renderer(rend
     context.swapchain =
         CreateRef<VulkanSwapchain>(MemoryTag::RENDERER, context, rendererInfo.width, rendererInfo.height);
 
+    vk::CommandPoolCreateInfo graphicsCommandPoolCreateInfo{
+        .queueFamilyIndex = context.device->queueFamilyIndices.graphicsFamily.value()
+    };
+    context.graphicsCommandPool =
+        context.device->logicalDevice.createCommandPool(graphicsCommandPoolCreateInfo, context.allocator);
+
+    for (size_t i = 0; i < context.swapchain->images.size(); i++)
+        context.graphicsCommandBuffers.pushBack(
+            CreateRef<VulkanCommandBuffer>(Memory::MemoryTag::RENDERER, context, context.graphicsCommandPool, true));
+
     LOG_DEBUG("Initializing Vulkan Renderer");
 }
 
@@ -99,8 +111,31 @@ bool VulkanRenderer::endFrame(float deltaTime)
 }
 
 void VulkanRenderer::resize(uint32_t width, uint32_t height)
-{  // Do vulkan specific resize shi (swappchain recreation)
+{
     this->width = width, this->height = height;
+
+    context.device->swapchainInfo.surfaceCapabilities =
+        context.device->physicalDevice.getSurfaceCapabilitiesKHR(context.surface);
+
+    context.device->logicalDevice.waitIdle();
+    context.swapchain.reset();
+    context.swapchain = CreateRef<VulkanSwapchain>(Memory::MemoryTag::RENDERER, context, width, height);
+}
+
+Ref<Buffer> VulkanRenderer::createVertexBuffer(void* data, size_t vertexCount)
+{
+    BufferInfo bufferInfo{ .usage = BufferUsage::Vertex,
+                           .size = vertexCount * sizeof(Vertex),
+                           .backendData = &context };
+    return Buffer::Create(bufferInfo);
+}
+
+Ref<Buffer> VulkanRenderer::createIndexBuffer(void* data, size_t indexCount)
+{
+    BufferInfo bufferInfo{ .usage = BufferUsage::Index,
+                           .size = indexCount * sizeof(uint32_t),
+                           .backendData = &context };
+    return Buffer::Create(bufferInfo);
 }
 
 }  // namespace CAL

@@ -2,6 +2,7 @@
 
 #include <Defines.hpp>
 #include <cstdint>
+#include <vk_mem_alloc.hpp>
 
 #include "../VulkanTypes.hpp"
 #include "Core/Containers/Vector.hpp"
@@ -22,6 +23,8 @@ struct VulkanSwapchain
 
     vk::Format depthImageFormat{ vk::Format::eUndefined };
     vk::Image depthImage{ nullptr };
+    vk::ImageView depthImageView{ nullptr };
+    vma::Allocation depthImageAllocation{ nullptr };
 
     Vector<vk::Image> images{};
     Vector<vk::ImageView> imageViews{};

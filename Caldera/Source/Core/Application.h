@@ -2,6 +2,7 @@
 
 #include <Defines.hpp>
 
+#include "Core/AssetManager.hpp"
 #include "Core/Clock.h"
 #include "Game/Game.hpp"
 #include "Renderer/Renderer.hpp"
@@ -38,6 +39,7 @@ class Application
     Ref<Window> window{ nullptr };
     Ref<Game> gameInstance{ nullptr };
     Ref<Renderer> renderer{ nullptr };
+    Ref<AssetManager> assetManager{ nullptr };
 };
 
 }  // namespace CAL

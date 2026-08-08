@@ -11,17 +11,6 @@
 namespace CAL
 {
 
-// class Ref
-// {
-//    public:
-//     Ref() : ptr(std::make_unique<Ty>()) {}
-//
-//    private:
-//     std::unique_ptr<Ty> ptr{ nullptr };
-// };
-//
-// template <class Ty>
-// using sharedPtr = std::shared_ptr<Ty>;
 namespace Memory
 {
 

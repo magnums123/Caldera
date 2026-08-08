@@ -1,8 +1,10 @@
 #include "Renderer/Vulkan/Structures/VulkanSwapchain.hpp"
 
+#include <algorithm>
+#include <vk_mem_alloc.hpp>
+
 #include "Core/Asserts.hpp"
 #include "Core/Containers/Vector.hpp"
-#include "Core/Logger.hpp"
 #include "Renderer/Vulkan/Structures/VulkanDevice.hpp"
 #include "vulkan/vulkan.hpp"
 
@@ -14,20 +16,12 @@ VulkanSwapchain::VulkanSwapchain(const VulkanContext& context, uint32_t width, u
     width = width;
     height = height;
 
-    if (width < context.device->swapchainInfo.surfaceCapabilities.minImageExtent.width ||
-        width > context.device->swapchainInfo.surfaceCapabilities.maxImageExtent.width)
-    {
-        LOG_ERROR("Invalid Swapchain Extent Width: {}", width);
-        LOG_ERROR("Using: {}", context.device->swapchainInfo.surfaceCapabilities.minImageExtent.width);
-        width = context.device->swapchainInfo.surfaceCapabilities.minImageExtent.width;
-    }
-    if (height < context.device->swapchainInfo.surfaceCapabilities.minImageExtent.height ||
-        height > context.device->swapchainInfo.surfaceCapabilities.maxImageExtent.height)
-    {
-        LOG_ERROR("Invalid Swapchain Extent Height: {}", height);
-        LOG_ERROR("Using: {}", context.device->swapchainInfo.surfaceCapabilities.minImageExtent.height);
-        height = context.device->swapchainInfo.surfaceCapabilities.minImageExtent.height;
-    }
+    width = std::clamp(
+        width, context.device->swapchainInfo.surfaceCapabilities.minImageExtent.width,
+        context.device->swapchainInfo.surfaceCapabilities.maxImageExtent.width);
+    height = std::clamp(
+        height, context.device->swapchainInfo.surfaceCapabilities.minImageExtent.height,
+        context.device->swapchainInfo.surfaceCapabilities.maxImageExtent.height);
 
     surfaceFormat = chooseBestSurfaceFormat(context.device->swapchainInfo.surfaceFormats);
     auto presentMode = chooseBestPresentMode(context.device->swapchainInfo.presentModes);
@@ -44,7 +38,7 @@ VulkanSwapchain::VulkanSwapchain(const VulkanContext& context, uint32_t width, u
                                                     .compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,
                                                     .presentMode = presentMode };
 
-    swapchain = context.device->logicalDevice.createSwapchainKHR(swapchainCreateInfo);
+    swapchain = context.device->logicalDevice.createSwapchainKHR(swapchainCreateInfo, context.allocator);
 
     for (const auto& image : context.device->logicalDevice.getSwapchainImagesKHR(swapchain)) images.pushBack(image);
     imageViews.resize(images.size());
@@ -58,7 +52,32 @@ VulkanSwapchain::VulkanSwapchain(const VulkanContext& context, uint32_t width, u
     }
 
     ASSERT_MSG(depthImageFormat != vk::Format::eUndefined, "Failed to find suitable Format for Depth Image");
-    vk::ImageCreateInfo depthImageCreateInfo{};
+
+    vk::ImageCreateInfo depthImageCreateInfo{ .imageType = vk::ImageType::e2D,
+                                              .format = depthImageFormat,
+                                              .extent{ .width = width, .height = height, .depth = 1 },
+                                              .mipLevels = 1,
+                                              .arrayLayers = 1,
+                                              .samples = vk::SampleCountFlagBits::e1,
+                                              .tiling = vk::ImageTiling::eOptimal,
+                                              .usage = vk::ImageUsageFlagBits::eDepthStencilAttachment,
+                                              .initialLayout = vk::ImageLayout::eUndefined };
+
+    vma::AllocationCreateInfo allocationCreateInfo{ .flags = vma::AllocationCreateFlagBits::eDedicatedMemory,
+                                                    .usage = vma::MemoryUsage::eAuto };
+    auto imageAndAllocation = context.vmaAllocator.createImage(depthImageCreateInfo, allocationCreateInfo);
+
+    depthImage = imageAndAllocation.second;
+    depthImageAllocation = imageAndAllocation.first;
+
+    vk::ImageViewCreateInfo depthImageViewCreateInfo{
+        .image = depthImage,
+        .viewType = vk::ImageViewType::e2D,
+        .format = depthImageFormat,
+        .subresourceRange{ .aspectMask = vk::ImageAspectFlagBits::eDepth, .levelCount = 1, .layerCount = 1 },
+    };
+
+    depthImageView = context.device->logicalDevice.createImageView(depthImageViewCreateInfo, context.allocator);
 }
 
 VulkanSwapchain::~VulkanSwapchain() {}
