@@ -1,6 +1,18 @@
 project(Caldera)
 # Collect all source files in ${PROJECT_NAME}/Source
-file(GLOB_RECURSE ENGINE_SOURCES "Source/*.cpp" "Source/*.hpp" "Source/*.h")
+file(GLOB_RECURSE ENGINE_SOURCES
+    "Source/*.cpp"
+    "Source/*.hpp"
+    "Source/*.h"
+)
+
+if(WIN32)
+    list(FILTER ENGINE_SOURCES EXCLUDE REGEX "/Platform/Linux/")
+    list(FILTER ENGINE_SOURCES EXCLUDE REGEX "/Window/Linux/")
+elseif(UNIX)
+    list(FILTER ENGINE_SOURCES EXCLUDE REGEX "/Platform/Windows/")
+    list(FILTER ENGINE_SOURCES EXCLUDE REGEX "/Window/Windows/")
+endif()
 
 # 1. Build Caldera as a shared library
 add_library(${PROJECT_NAME} SHARED ${ENGINE_SOURCES})

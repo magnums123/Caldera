@@ -3,6 +3,7 @@
 # ====================================================================
 # Targets the exact build folder you are creating via build.bat / run.bat
 /build/
+/.cache/
 /build-*/
 cmake-build-*/
 

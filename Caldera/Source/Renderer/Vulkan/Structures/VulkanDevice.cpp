@@ -1,13 +1,18 @@
-#include "Renderer/Vulkan/Structures/VulkanDevice.hpp"
-
 #include <Renderer/Vulkan/VulkanTypes.hpp>
+
 #include <set>
 
+#include "Renderer/Vulkan/Structures/VulkanDevice.hpp"
+
 #include "Core/Asserts.hpp"
-#include "Core/Containers/Vector.hpp"
 #include "Core/Logger.hpp"
+
+#include "Core/Containers/Vector.hpp"
+
 #include "Renderer/Vulkan/VulkanTypes.hpp"
+
 #include "Utility/String.hpp"
+
 #include "vulkan/vulkan.hpp"
 
 namespace CAL
@@ -122,7 +127,7 @@ VulkanDevice::VulkanDevice(const VulkanContext& context)
                 .queueFamilyIndex = queueFamily, .queueCount = 1, .pQueuePriorities = &queuePriority });
     }
 
-    Vector<const char*> extensions{ vk::KHRSwapchainExtensionName, vk::KHRExternalMemoryWin32ExtensionName };
+    Vector<const char*> extensions{ vk::KHRSwapchainExtensionName };
 
     vk::StructureChain<
         vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan11Features, vk::PhysicalDeviceVulkan12Features,

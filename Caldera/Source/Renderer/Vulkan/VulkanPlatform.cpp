@@ -1,5 +1,6 @@
 #include "VulkanPlatform.hpp"
 
+
 namespace CAL
 {
 
@@ -15,11 +16,11 @@ namespace CAL
 vk::SurfaceKHR platformCreateVulkanSurface(VulkanContext& context, const RendererInfo& rendererInfo)
 {
 #if defined(_WIN32)
-    vk::Win32SurfaceCreateInfoKHR surfaceCreateInfo{ .hinstance = (HINSTANCE)rendererInfo.window->getInternalState(),
+    vk::X112SurfaceCreateInfoKHR surfaceCreateInfo{ .hinstance = (HINSTANCE)rendererInfo.window->getInternalState(),
                                                      .hwnd = (HWND)rendererInfo.window->getHandle() };
 
     vk::SurfaceKHR surface(nullptr);
-    auto res = context.instance.createWin32SurfaceKHR(&surfaceCreateInfo, nullptr, &surface);
+    auto res = context.instance.createX11SurfaceKHR(&surfaceCreateInfo, nullptr, &surface);
     return std::move(surface);
 #endif
 
