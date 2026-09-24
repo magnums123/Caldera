@@ -5,18 +5,19 @@ BUILD_TYPE="Debug"
 
 echo "[INFO] Auto-building Sandbox ($BUILD_TYPE) before running..."
 
-cmake -G "Ninja" \
-    -DCMAKE_CXX_COMPILER=clang++ \
-    -DCMAKE_C_COMPILER=clang \
-    -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
-    -B build
+# cmake -G "Ninja" \
+#    -DCMAKE_CXX_COMPILER=clang++ \
+#    -DCMAKE_C_COMPILER=clang \
+#    -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+#    -B build
 
 if [ $? -ne 0 ]; then
     echo "[ERROR] CMake configuration failed!"
     exit $?
 fi
 
-cmake --build build --config "$BUILD_TYPE" --target Sandbox Caldera
+cmake --build build --config "$BUILD_TYPE" --parallel 3 --target Sandbox Caldera
+
 
 if [ $? -ne 0 ]; then
     echo "[ERROR] Build failed! Unable to run Sandbox."

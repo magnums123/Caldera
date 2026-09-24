@@ -56,7 +56,7 @@ fi
 
 echo
 echo "[INFO] Building targets..."
-cmake --build build --config "$BUILD_TYPE" "${TARGET[@]}"
+cmake --build build --parallel 3 --config "$BUILD_TYPE" "${TARGET[@]}"
 
 if [ $? -ne 0 ]; then
     echo "[ERROR] Build failed!"

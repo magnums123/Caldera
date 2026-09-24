@@ -1,21 +1,16 @@
-
 #pragma once
-
-#include "Utility/String.hpp"
-
-#if defined(_WIN32)
-// clang-format off
-// clang-format on
 
 #include "Platform/Platform.hpp"
 
+#include "Utility/String.hpp"
+
 namespace CAL
 {
-class Win32Platform : public Platform
+class X11Platform : public Platform
 {
   public:
-  Win32Platform();
-  ~Win32Platform() override;
+  X11Platform();
+  ~X11Platform() override;
 
   StringView getRequiredExtensions() override;
 
@@ -23,5 +18,4 @@ class Win32Platform : public Platform
   void sleep(uint64_t ms) const override;
 };
 
-#endif
 } // namespace CAL

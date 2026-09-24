@@ -1,41 +1,60 @@
 #pragma once
 
-#include "Core/Event/Event.hpp"
-#include "Core/Memory.hpp"
 #include "Defines.hpp"
+
+#include "Core/Memory.hpp"
+
+#include "Core/Event/Event.hpp"
+
 #include "Utility/String.hpp"
 
 namespace CAL
 {
 struct WindowCreateInfo
 {
-    String name;
-    uint32_t width, height;
+  String name;
+  uint32_t width, height;
 };
 
 class Window
 {
-   public:
-    Window(const WindowCreateInfo& createInfo) : width(createInfo.width), height(createInfo.height) {}
-    virtual ~Window() = default;
+  public:
+  Window(const WindowCreateInfo& createInfo)
+      : width(createInfo.width)
+      , height(createInfo.height)
+  {
+  }
+  virtual ~Window() = default;
 
-    EventDispatcher dispatcher;
+  EventDispatcher dispatcher;
 
-    inline uint32_t getWidth() const { return width; }
-    inline uint32_t getHeight() const { return height; }
-    inline void* getHandle() const { return handle; }
-    inline void* getInternalState() const { return internalState; }
+  inline uint32_t getWidth() const
+  {
+    return width;
+  }
+  inline uint32_t getHeight() const
+  {
+    return height;
+  }
+  inline void* getHandle() const
+  {
+    return handle;
+  }
+  inline void* getInternalState() const
+  {
+    return internalState;
+  }
 
-    virtual void toggleFullscreen() = 0;
-    virtual bool shouldClose() = 0;
-    virtual void close() = 0;
-    virtual void update() = 0;
+  virtual void toggleFullscreen() = 0;
+  virtual bool shouldClose() = 0;
+  virtual void close() = 0;
+  virtual void update() = 0;
 
-    static Ref<Window> Create(const WindowCreateInfo& createInfo);
+  static Ref<Window> Create(const WindowCreateInfo& createInfo);
 
-   protected:
-    void* handle;
-    void* internalState;
-    uint32_t width, height;
+  protected:
+  void* handle;
+  void* internalState;
+  uint32_t width, height;
 };
-}  // namespace CAL
+} // namespace CAL

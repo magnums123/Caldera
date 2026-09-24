@@ -7,11 +7,11 @@ namespace CAL::Math
 
 struct Vector4f
 {
-    float x, y, z, w;
+  float x, y, z, w;
 };
 
 struct Vector4d
 {
-    double x, y, z, w;
+  double x, y, z, w;
 };
-}  // namespace CAL::Math
+} // namespace CAL::Math

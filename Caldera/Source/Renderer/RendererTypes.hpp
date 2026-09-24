@@ -11,17 +11,17 @@ namespace CAL
 
 struct RenderPacket
 {
-    float deltaTime;
-    Vector<Ref<MeshAsset>> meshes;
+  float deltaTime;
+  Vector<Ref<MeshAsset>> meshes;
 };
 
 struct RendererInfo
 {
-    uint32_t width, height;
-    StringView name;
-    RendererBackendType backendType;
-    Ref<Platform>& platform;
-    Ref<Window>& window;
+  uint32_t width, height;
+  StringView name;
+  RendererBackendType backendType;
+  Ref<Platform>& platform;
+  Ref<Window>& window;
 };
 
-}  // namespace CAL
+} // namespace CAL

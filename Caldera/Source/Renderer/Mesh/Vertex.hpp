@@ -10,9 +10,9 @@ namespace CAL
 
 struct Vertex
 {
-    Math::Vector3f Position;
-    Math::Vector3f Normal;
-    Math::Vector2f UV;
+  Math::Vector3f Position;
+  Math::Vector3f Normal;
+  Math::Vector2f UV;
 };
 
-}  // namespace CAL
+} // namespace CAL

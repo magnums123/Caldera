@@ -8,18 +8,18 @@ namespace CAL::Math
 {
 struct mat4x4f
 {
-    Vector4f x_axis;
-    Vector4f y_axis;
-    Vector4f z_axis;
-    Vector4f w_axis;
+  Vector4f x_axis;
+  Vector4f y_axis;
+  Vector4f z_axis;
+  Vector4f w_axis;
 };
 
 struct mat4x4d
 {
-    Vector4d x_axis;
-    Vector4d y_axis;
-    Vector4d z_axis;
-    Vector4d w_axis;
+  Vector4d x_axis;
+  Vector4d y_axis;
+  Vector4d z_axis;
+  Vector4d w_axis;
 };
 
-}  // namespace CAL::Math
+} // namespace CAL::Math

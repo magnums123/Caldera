@@ -1,0 +1,45 @@
+BasedOnStyle: LLVM
+
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+
+BreakBeforeBraces: Allman
+
+AccessModifierOffset: 0
+IndentAccessModifiers: false
+
+NamespaceIndentation: None
+FixNamespaceComments: true
+
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+SpaceBeforeParens: ControlStatements
+SpaceBeforeAssignmentOperators: true
+
+ColumnLimit: 100
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: false
+
+BreakBeforeBinaryOperators: None
+BreakConstructorInitializers: BeforeComma
+
+SortIncludes: Never
+IncludeBlocks: Preserve
+
+DerivePointerAlignment: false
+
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+
+ReflowComments: false
+
+CommentPragmas: '^ IWYU pragma:'
+
+NamespaceMacros:
+  - CAL_NAMESPACE_BEGIN
+  - CAL_NAMESPACE_END

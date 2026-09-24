@@ -12,51 +12,57 @@
 namespace CAL
 {
 
-VulkanBuffer::VulkanBuffer(const BufferInfo& bufferInfo) : Buffer()
+VulkanBuffer::VulkanBuffer(const BufferInfo& bufferInfo)
+    : Buffer()
 {
-    auto context = reinterpret_cast<VulkanContext*>(bufferInfo.backendData);
-    usage = bufferInfo.usage;
+  auto context = reinterpret_cast<VulkanContext*>(bufferInfo.backendData);
+  usage = bufferInfo.usage;
 
-    vk::BufferUsageFlags usageFlags;
-    vma::AllocationCreateFlags allocationFlags;
+  vk::BufferUsageFlags usageFlags;
+  vma::AllocationCreateFlags allocationFlags;
 
-    switch (bufferInfo.usage)
-    {
-        case BufferUsage::Vertex:
-            usageFlags |= vk::BufferUsageFlagBits::eVertexBuffer;
-            allocationFlags |= vma::AllocationCreateFlagBits::eHostAccessSequentialWrite |
-                               vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead |
-                               vma::AllocationCreateFlagBits::eMapped;
-            break;
-        case BufferUsage::Index:
-            usageFlags |= vk::BufferUsageFlagBits::eIndexBuffer;
-            allocationFlags |= vma::AllocationCreateFlagBits::eHostAccessSequentialWrite |
-                               vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead |
-                               vma::AllocationCreateFlagBits::eMapped;
-            break;
-        case BufferUsage::Uniform:
-            usageFlags |= vk::BufferUsageFlagBits::eUniformBuffer;
-            allocationFlags |= vma::AllocationCreateFlagBits::eHostAccessSequentialWrite |
-                               vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead |
-                               vma::AllocationCreateFlagBits::eMapped;
-            break;
-        case BufferUsage::Storage:
-            LOG_ERROR("Storage Buffers have not been added");
-            return;
-    }
-    vk::BufferCreateInfo createInfo{
-        .size = bufferInfo.size,
-        .usage = usageFlags,
-    };
+  switch (bufferInfo.usage)
+  {
+  case BufferUsage::Vertex:
+    usageFlags |= vk::BufferUsageFlagBits::eVertexBuffer;
+    allocationFlags |= vma::AllocationCreateFlagBits::eHostAccessSequentialWrite |
+                       vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead |
+                       vma::AllocationCreateFlagBits::eMapped;
+    break;
+  case BufferUsage::Index:
+    usageFlags |= vk::BufferUsageFlagBits::eIndexBuffer;
+    allocationFlags |= vma::AllocationCreateFlagBits::eHostAccessSequentialWrite |
+                       vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead |
+                       vma::AllocationCreateFlagBits::eMapped;
+    break;
+  case BufferUsage::Uniform:
+    usageFlags |= vk::BufferUsageFlagBits::eUniformBuffer;
+    allocationFlags |= vma::AllocationCreateFlagBits::eHostAccessSequentialWrite |
+                       vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead |
+                       vma::AllocationCreateFlagBits::eMapped;
+    break;
+  case BufferUsage::Storage:
+    LOG_ERROR("Storage Buffers have not been added");
+    return;
+  }
+  vk::BufferCreateInfo createInfo{
+      .size = bufferInfo.size,
+      .usage = usageFlags,
+  };
 
-    vma::AllocationCreateInfo allocationInfo{ .flags = allocationFlags, .usage = vma::MemoryUsage::eAuto };
+  vma::AllocationCreateInfo allocationInfo{.flags = allocationFlags,
+                                           .usage = vma::MemoryUsage::eAuto};
 
-    auto bufferAndAllocation = context->vmaAllocator.createBuffer(createInfo, allocationInfo, bufferAllocationInfo);
+  auto bufferAndAllocation =
+      context->vmaAllocator.createBuffer(createInfo, allocationInfo, bufferAllocationInfo);
 
-    buffer = bufferAndAllocation.second;
-    bufferAllocation = bufferAndAllocation.first;
+  buffer = bufferAndAllocation.second;
+  bufferAllocation = bufferAndAllocation.first;
 }
 
-void VulkanBuffer::setData(void* data, size_t size) { copyMemory(bufferAllocationInfo.pMappedData, data, size); }
+void VulkanBuffer::setData(void* data, size_t size)
+{
+  copyMemory(bufferAllocationInfo.pMappedData, data, size);
+}
 
-}  // namespace CAL
+} // namespace CAL

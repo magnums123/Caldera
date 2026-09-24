@@ -12,6 +12,9 @@ if(WIN32)
 elseif(UNIX)
     list(FILTER ENGINE_SOURCES EXCLUDE REGEX "/Platform/Windows/")
     list(FILTER ENGINE_SOURCES EXCLUDE REGEX "/Window/Windows/")
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(XCB REQUIRED xcb)
 endif()
 
 # 1. Build Caldera as a shared library
@@ -23,6 +26,11 @@ include(GenerateExportHeader)
 # 3. Generate the export header with your custom macro
 generate_export_header(${PROJECT_NAME}
     EXPORT_MACRO_NAME CALEXPORT
+)
+
+
+target_precompile_headers(Caldera PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/Source/Defines.hpp"
 )
 
 # 4. Set up clean include paths for both Caldera and Sandbox
@@ -58,4 +66,9 @@ target_compile_definitions(${PROJECT_NAME}
         $<$<CONFIG:MinSizeRel>:NDEBUG RELEASE>
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE vulkan Vulkan::Headers VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	vulkan 
+	Vulkan::Headers 
+	VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp
+	${XCB_LIBRARIES}
+)

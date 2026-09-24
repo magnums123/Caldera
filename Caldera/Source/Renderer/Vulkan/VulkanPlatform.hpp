@@ -8,6 +8,7 @@
 namespace CAL
 {
 
-vk::SurfaceKHR platformCreateVulkanSurface(VulkanContext& context, const RendererInfo& rendererInfo);
+vk::SurfaceKHR platformCreateVulkanSurface(VulkanContext& context,
+                                           const RendererInfo& rendererInfo);
 
-}  // namespace CAL
+} // namespace CAL

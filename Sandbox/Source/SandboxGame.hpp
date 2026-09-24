@@ -4,10 +4,10 @@
 
 class SandboxGame : public CAL::Game
 {
-   public:
-    SandboxGame();
-    ~SandboxGame() override;
+  public:
+  SandboxGame();
+  ~SandboxGame() override;
 
-    void update(float deltaTime) override;
-    void render(float deltaTime) override;
+  void update(float deltaTime) override;
+  void render(float deltaTime) override;
 };

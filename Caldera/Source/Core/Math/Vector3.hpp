@@ -7,12 +7,12 @@ namespace CAL::Math
 
 struct Vector3f
 {
-    float x, y, z;
+  float x, y, z;
 };
 
 struct Vector3d
 {
-    double x, y, z;
+  double x, y, z;
 };
 
-}  // namespace CAL::Math
+} // namespace CAL::Math

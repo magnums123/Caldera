@@ -1,4 +1,4 @@
-#include "Win32Platform.hpp"
+#include "X11Platform.hpp"
 
 #include "Core/Memory.hpp"
 
@@ -22,34 +22,36 @@ namespace CAL
 static float clockFrequency;
 static std::int64_t startTime;
 
-Ref<Platform> Platform::Create() { return std::make_shared<Win32Platform>(); }
-// Ref<Platform> Platform::Create() { return CreateRef<Win32Platform>(Memory::MemoryTag::APPLICATION); }
+Ref<Platform> Platform::Create()
+{
+  return CreateRef<Win32Platform>(Memory::MemoryTag::APPLICATION);
+}
 
 Win32Platform::Win32Platform()
 {
-    LARGE_INTEGER frequency;
-    QueryPerformanceFrequency(&frequency);
-    clockFrequency = 1.f / static_cast<float>(frequency.QuadPart);
-    QueryPerformanceCounter((LARGE_INTEGER*)&startTime);
+  LARGE_INTEGER frequency;
+  QueryPerformanceFrequency(&frequency);
+  clockFrequency = 1.f / static_cast<float>(frequency.QuadPart);
+  QueryPerformanceCounter((LARGE_INTEGER*)&startTime);
 }
 
 Win32Platform::~Win32Platform() {}
 
-void* Win32Platform::allocateMemory(size_t size, bool aligned) const { return std::malloc(size); }
-void Win32Platform::freeMemory(void* block, bool aligned) const { std::free(block); }
-void* Win32Platform::zeroMemory(void* block, size_t size) const { return setMemory(block, 0, size); }
-void Win32Platform::copyMemory(void* dst, void* src, size_t size) const { memcpy(dst, src, size); }
-void* Win32Platform::setMemory(void* dst, std::int32_t value, size_t size) const { return memset(dst, value, size); }
-
-StringView Win32Platform::getRequiredExtensions() { return vk::KHRWin32SurfaceExtensionName; }
+StringView Win32Platform::getRequiredExtensions()
+{
+  return vk::KHRWin32SurfaceExtensionName;
+}
 
 float Win32Platform::getAbsoluteTime() const
 {
-    LARGE_INTEGER currentTime;
-    QueryPerformanceCounter(&currentTime);
-    return (float)currentTime.QuadPart * clockFrequency;
+  LARGE_INTEGER currentTime;
+  QueryPerformanceCounter(&currentTime);
+  return (float)currentTime.QuadPart * clockFrequency;
 }
-void Win32Platform::sleep(uint64_t ms) const { Sleep(ms); }
+void Win32Platform::sleep(uint64_t ms) const
+{
+  Sleep(ms);
+}
 
-}  // namespace CAL
+} // namespace CAL
 #endif

@@ -1,116 +1,123 @@
-#include "Application.h"
-
 #include <cstdint>
+
 #include <filesystem>
 
+#include "Application.hpp"
+
 #include "Core/AssetManager.hpp"
-#include "Core/Clock.h"
-#include "Core/Event/Event.hpp"
-#include "Core/Event/WindowEvents.hpp"
+#include "Core/Clock.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Memory.hpp"
 #include "Core/UUID.hpp"
+
+#include "Core/Event/Event.hpp"
+#include "Core/Event/WindowEvents.hpp"
+
 #include "Game/Game.hpp"
+
 #include "Renderer/Renderer.hpp"
 
 namespace CAL
 {
 
 Application::Application(const AppInfo& appInfo, Ref<Game> game)
-    : window(nullptr),
-      gameInstance(std::move(game)),
-      platform(Platform::Create()),
-      clock(nullptr),
-      headless(appInfo.headless)
+    : window(nullptr)
+    , gameInstance(std::move(game))
+    , platform(Platform::Create())
+    , clock(nullptr)
+    , headless(appInfo.headless)
 {
-    Memory::initMemory();
-    clock = CreateRef<Clock>(Memory::MemoryTag::APPLICATION, platform);
+  Memory::initMemory();
+  clock = CreateRef<Clock>(Memory::MemoryTag::APPLICATION, platform);
 
-    if (headless)
-        // Do headless configuration
-        return;
+  if (headless)
+    // Do headless configuration
+    return;
 
-    WindowCreateInfo createInfo{ .name = appInfo.appName, .width = appInfo.width, .height = appInfo.height };
-    window = Window::Create(createInfo);
+  WindowCreateInfo createInfo{
+      .name = appInfo.appName, .width = appInfo.width, .height = appInfo.height};
+  window = Window::Create(createInfo);
 
-    RendererInfo rendererInfo{ .width = appInfo.width,
-                               .height = appInfo.height,
-                               .name = appInfo.appName,
-                               .backendType = RendererBackendType::Vulkan,
-                               .platform = platform,
-                               .window = window };
-    renderer = Renderer::Create(rendererInfo);
-    assetManager = CreateRef<AssetManager>(Memory::MemoryTag::APPLICATION);
-    // gameInstance.assetManager = assetManager;
+  RendererInfo rendererInfo{.width = appInfo.width,
+                            .height = appInfo.height,
+                            .name = appInfo.appName,
+                            .backendType = RendererBackendType::Vulkan,
+                            .platform = platform,
+                            .window = window};
+  renderer = Renderer::Create(rendererInfo);
+  assetManager = CreateRef<AssetManager>(Memory::MemoryTag::APPLICATION);
+  // gameInstance.assetManager = assetManager;
 
-    // TEMP
-    window->dispatcher.addListener(
-        EventType::WINDOW_CLOSED,
-        [&](Event& e)
-        {
-            isRunning = false;
-            e.handle();
-        });
-    window->dispatcher.addListener(
-        EventType::WINDOW_RESIZED,
-        [&](Event& e)
-        {
-            auto event = e.toType<const WindowResizeEvent*>();
-            renderer->resize(event->getWidth(), event->getHeight());
-        });
+  // TEMP
+  window->dispatcher.addListener(EventType::WINDOW_CLOSED,
+                                 [&](Event& e)
+                                 {
+                                   isRunning = false;
+                                   e.handle();
+                                 });
+  window->dispatcher.addListener(EventType::WINDOW_RESIZED,
+                                 [&](Event& e)
+                                 {
+                                   auto event = e.toType<const WindowResizeEvent*>();
+                                   renderer->resize(event->getWidth(), event->getHeight());
+                                 });
 
-    // LOG_DEBUG("Current Running Dir: {}", std::filesystem::current_path().string());
+  // LOG_DEBUG("Current Running Dir: {}", std::filesystem::current_path().string());
 
-    MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj", renderer);
-    MeshHandle suzanne = assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
-    assetManager->unloadMesh(suzanne);
+  MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj", renderer);
+  MeshHandle suzanne = assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
+  assetManager->unloadMesh(suzanne);
 
-    auto mesh = assetManager->getMesh(suzanne);
+  auto mesh = assetManager->getMesh(suzanne);
 
-    isRunning = true;
-    isSuspended = false;
+  isRunning = true;
+  isSuspended = false;
 }
 
-Application::~Application() { Memory::shutdownMemory(); }
+Application::~Application()
+{
+  Memory::shutdownMemory();
+}
 
 void Application::run()
 {
-    clock->update();
-    lastTime = clock->getElapsedTime();
+  clock->update();
+  lastTime = clock->getElapsedTime();
 
-    float runningTime{};
-    uint64_t frameCount{};
-    float targetFrameTime{ 1.f / 60.f };
+  float runningTime{};
+  uint64_t frameCount{};
+  float targetFrameTime{1.f / 60.f};
 
-    LOG_DEBUG("{}", Memory::getMemoryUsageString());
+  LOG_DEBUG("{}", Memory::getMemoryUsageString());
 
-    while (isRunning)
+  while (isRunning)
+  {
+    window->update();
+    if (!isSuspended)
     {
-        window->update();
-        if (!isSuspended)
-        {
-            clock->update();
-            float currentTime{ clock->getElapsedTime() };
-            float deltaTime{ currentTime - lastTime };
-            float frameStartTime{ platform->getAbsoluteTime() };
+      clock->update();
+      float currentTime{clock->getElapsedTime()};
+      float deltaTime{currentTime - lastTime};
+      float frameStartTime{platform->getAbsoluteTime()};
 
-            gameInstance->update(deltaTime);
-            gameInstance->render(deltaTime);
+      gameInstance->update(deltaTime);
+      gameInstance->render(deltaTime);
 
-            RenderPacket packet{ .deltaTime = deltaTime, .meshes = {} };
-            renderer->drawFrame(packet);
+      RenderPacket packet{.deltaTime = deltaTime, .meshes = {}};
+      renderer->drawFrame(packet);
 
-            float frameEndTime{ platform->getAbsoluteTime() };
-            float frameTime{ frameEndTime - frameStartTime };
-            runningTime += frameTime;
-            float remainingSeconds{ targetFrameTime - frameTime };
+      float frameEndTime{platform->getAbsoluteTime()};
+      float frameTime{frameEndTime - frameStartTime};
+      runningTime += frameTime;
+      float remainingSeconds{targetFrameTime - frameTime};
 
-            bool limitFrames{ false };
-            if (remainingSeconds > 0 && limitFrames) platform->sleep((remainingSeconds * 1000) - 1);
-            frameCount += 1;
+      bool limitFrames{false};
+      if (remainingSeconds > 0 && limitFrames)
+        platform->sleep((remainingSeconds * 1000) - 1);
+      frameCount += 1;
 
-            lastTime = currentTime;
-        }
+      lastTime = currentTime;
     }
+  }
 }
-}  // namespace CAL
+} // namespace CAL

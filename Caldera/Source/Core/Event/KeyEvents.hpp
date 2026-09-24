@@ -10,26 +10,40 @@ namespace CAL
 
 class KeyPressEvent : public Event
 {
-   public:
-    KeyPressEvent(KeyCodeID keyCode) : Event(EventType::KEY_PRESSED, "KeyPressEvent"), keyCode(keyCode) {}
-    ~KeyPressEvent() {}
+  public:
+  KeyPressEvent(KeyCodeID keyCode)
+      : Event(EventType::KEY_PRESSED, "KeyPressEvent")
+      , keyCode(keyCode)
+  {
+  }
+  ~KeyPressEvent() {}
 
-    inline KeyCodeID getKeyCode() const { return keyCode; }
+  inline KeyCodeID getKeyCode() const
+  {
+    return keyCode;
+  }
 
-   private:
-    KeyCodeID keyCode{ KeyCodeID::Unknown };
+  private:
+  KeyCodeID keyCode{KeyCodeID::Unknown};
 };
 
 class KeyReleaseEvent : public Event
 {
-   public:
-    KeyReleaseEvent(KeyCodeID keyCode) : Event(EventType::KEY_RELEASED, "KeyReleaseEvent"), keyCode(keyCode) {}
-    ~KeyReleaseEvent() {}
+  public:
+  KeyReleaseEvent(KeyCodeID keyCode)
+      : Event(EventType::KEY_RELEASED, "KeyReleaseEvent")
+      , keyCode(keyCode)
+  {
+  }
+  ~KeyReleaseEvent() {}
 
-    inline KeyCodeID getKeyCode() const { return keyCode; }
+  inline KeyCodeID getKeyCode() const
+  {
+    return keyCode;
+  }
 
-   private:
-    KeyCodeID keyCode{ KeyCodeID::Unknown };
+  private:
+  KeyCodeID keyCode{KeyCodeID::Unknown};
 };
 
-}  // namespace CAL
+} // namespace CAL

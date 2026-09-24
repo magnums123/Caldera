@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "Core/Memory.hpp"
+
 #include "Utility/String.hpp"
 
 namespace CAL
@@ -11,22 +12,16 @@ namespace CAL
 
 class Platform
 {
-   public:
-    Platform() {}
-    virtual ~Platform() = default;
+  public:
+  Platform() {}
+  virtual ~Platform() = default;
 
-    virtual void* allocateMemory(size_t size, bool aligned) const = 0;
-    virtual void freeMemory(void* block, bool aligned) const = 0;
-    virtual void* zeroMemory(void* block, size_t size) const = 0;
-    virtual void copyMemory(void* dst, void* src, size_t size) const = 0;
-    virtual void* setMemory(void* dst, std::int32_t value, size_t size) const = 0;
+  virtual StringView getRequiredExtensions() = 0;
+  // virtual vk::SurfaceKHR SurfaceKHR createRenderSurface() = 0;
 
-    virtual StringView getRequiredExtensions() = 0;
-    // virtual vk::SurfaceKHR SurfaceKHR createRenderSurface() = 0;
+  virtual float getAbsoluteTime() const = 0;
+  virtual void sleep(uint64_t ms) const = 0;
 
-    virtual float getAbsoluteTime() const = 0;
-    virtual void sleep(uint64_t ms) const = 0;
-
-    static Ref<Platform> Create();
+  static Ref<Platform> Create();
 };
-}  // namespace CAL
+} // namespace CAL

@@ -9,18 +9,16 @@
 #endif
 
 #ifndef NOMINMAX
-#define NOMINMAX  // Prevents min() and max() macro conflicts as well
+#define NOMINMAX // Prevents min() and max() macro conflicts as well
 #endif
 
 #define VK_USE_PLATFORM_WIN32_KHR
-#elif defined(UNIX)
-#define VK_USE_PLATFORM_X11_KHR
+#elif defined(__linux__)
+#define VK_USE_PLATFORM_XCB_KHR
 #endif
 
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-// #define VULKAN_HPP_DEFAULT_DISPATCHER_TYPE VULKAN_HPP_DISPATCH_LOADER_DYNAMIC_TYPE
 
 #define VULKAN_HPP_NO_CONSTRUCTORS
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 #include <vulkan/vulkan.hpp>

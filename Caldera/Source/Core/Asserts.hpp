@@ -20,58 +20,58 @@ void report_assertion_failure(StringView expression, StringView message, std::so
 #define debugBreak() __builtin_trap()
 #endif
 
-#define ASSERT(expr)                                                                   \
-    do                                                                                 \
-    {                                                                                  \
-        if (expr)                                                                      \
-        {                                                                              \
-        }                                                                              \
-        else                                                                           \
-        {                                                                              \
-            CAL::report_assertion_failure(#expr, "", std::source_location::current()); \
-            debugBreak();                                                              \
-        }                                                                              \
-    } while (false)
+#define ASSERT(expr)                                                                               \
+  do                                                                                               \
+  {                                                                                                \
+    if (expr)                                                                                      \
+    {                                                                                              \
+    }                                                                                              \
+    else                                                                                           \
+    {                                                                                              \
+      CAL::report_assertion_failure(#expr, "", std::source_location::current());                   \
+      debugBreak();                                                                                \
+    }                                                                                              \
+  } while (false)
 
-#define ASSERT_MSG(expr, message)                                                           \
-    do                                                                                      \
-    {                                                                                       \
-        if (expr)                                                                           \
-        {                                                                                   \
-        }                                                                                   \
-        else                                                                                \
-        {                                                                                   \
-            CAL::report_assertion_failure(#expr, message, std::source_location::current()); \
-            debugBreak();                                                                   \
-        }                                                                                   \
-    } while (false)
+#define ASSERT_MSG(expr, message)                                                                  \
+  do                                                                                               \
+  {                                                                                                \
+    if (expr)                                                                                      \
+    {                                                                                              \
+    }                                                                                              \
+    else                                                                                           \
+    {                                                                                              \
+      CAL::report_assertion_failure(#expr, message, std::source_location::current());              \
+      debugBreak();                                                                                \
+    }                                                                                              \
+  } while (false)
 
 #if defined(DEBUG)
-#define ASSERT_DEBUG(expr)                                                             \
-    do                                                                                 \
-    {                                                                                  \
-        if (expr)                                                                      \
-        {                                                                              \
-        }                                                                              \
-        else                                                                           \
-        {                                                                              \
-            CAL::report_assertion_failure(#expr, "", std::source_location::current()); \
-            debugBreak();                                                              \
-        }                                                                              \
-    } while (false)
+#define ASSERT_DEBUG(expr)                                                                         \
+  do                                                                                               \
+  {                                                                                                \
+    if (expr)                                                                                      \
+    {                                                                                              \
+    }                                                                                              \
+    else                                                                                           \
+    {                                                                                              \
+      CAL::report_assertion_failure(#expr, "", std::source_location::current());                   \
+      debugBreak();                                                                                \
+    }                                                                                              \
+  } while (false)
 
-#define ASSERT_MSG_DEBUG(expr, message)                                                     \
-    do                                                                                      \
-    {                                                                                       \
-        if (expr)                                                                           \
-        {                                                                                   \
-        }                                                                                   \
-        else                                                                                \
-        {                                                                                   \
-            CAL::report_assertion_failure(#expr, message, std::source_location::current()); \
-            debugBreak();                                                                   \
-        }                                                                                   \
-    } while (false)
+#define ASSERT_MSG_DEBUG(expr, message)                                                            \
+  do                                                                                               \
+  {                                                                                                \
+    if (expr)                                                                                      \
+    {                                                                                              \
+    }                                                                                              \
+    else                                                                                           \
+    {                                                                                              \
+      CAL::report_assertion_failure(#expr, message, std::source_location::current());              \
+      debugBreak();                                                                                \
+    }                                                                                              \
+  } while (false)
 #else
 #define ASSERT_DEBUG(expr)
 #define ASSERT_MSG_DEBUG(expr, message)
@@ -84,4 +84,4 @@ void report_assertion_failure(StringView expression, StringView message, std::so
 #define ASSERT_MSG_DEBUG(expr, message)
 #endif
 
-}  // namespace CAL
+} // namespace CAL

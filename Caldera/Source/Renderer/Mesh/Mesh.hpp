@@ -13,18 +13,22 @@ namespace CAL
 
 class Mesh
 {
-   public:
-    Mesh() {}
-    Mesh(Vector<Vertex>& vertices, Vector<uint32_t>& indices) : vertices(vertices), indices(indices) {}
+  public:
+  Mesh() {}
+  Mesh(Vector<Vertex>& vertices, Vector<uint32_t>& indices)
+      : vertices(vertices)
+      , indices(indices)
+  {
+  }
 
-    Vector<Vertex> vertices;
-    Vector<uint32_t> indices;
+  Vector<Vertex> vertices;
+  Vector<uint32_t> indices;
 };
 
 struct MeshAsset
 {
-    Ref<Buffer> vertexBuffer;
-    Ref<Buffer> indexBuffer;
+  Ref<Buffer> vertexBuffer;
+  Ref<Buffer> indexBuffer;
 };
 
-}  // namespace CAL
+} // namespace CAL
