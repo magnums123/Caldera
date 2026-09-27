@@ -40,12 +40,12 @@ VulkanRenderer::VulkanRenderer(const RendererInfo& rendererInfo)
 
   Vector<const char*> validationLayers{
 #if defined(DEBUG)
-      "VK_LAYER_KHRONOS_validation"
+      // "VK_LAYER_KHRONOS_validation"
 #endif
   };
 
   Vector<const char*> extensions{vk::KHRSurfaceExtensionName,
-                                 rendererInfo.platform->getRequiredExtensions().data()};
+                                 platformGetRequiredExtensions().data()};
 
   vk::InstanceCreateInfo instanceCreateInfo{.pApplicationInfo = &appInfo,
                                             .enabledLayerCount = (uint32_t)validationLayers.size(),

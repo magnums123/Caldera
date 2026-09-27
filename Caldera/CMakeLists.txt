@@ -15,6 +15,7 @@ elseif(UNIX)
 
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(XCB REQUIRED xcb)
+    pkg_check_modules(XCB_KEYSYMS REQUIRED xcb-keysyms)
 endif()
 
 # 1. Build Caldera as a shared library
@@ -71,4 +72,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	Vulkan::Headers 
 	VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp
 	${XCB_LIBRARIES}
+  ${XCB_KEYSYMS_LIBRARIES}
 )

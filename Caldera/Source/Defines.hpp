@@ -13,12 +13,22 @@
 #endif
 
 #define VK_USE_PLATFORM_WIN32_KHR
+
 #elif defined(__linux__)
+
 #define VK_USE_PLATFORM_XCB_KHR
+
 #endif
 
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 
 #define VULKAN_HPP_NO_CONSTRUCTORS
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+
 #include <vulkan/vulkan.hpp>
+
+// X11/XCB headers define Window as a preprocessor macro.
+// Do not let that leak into Caldera's C++ code.
+#ifdef Window
+#undef Window
+#endif

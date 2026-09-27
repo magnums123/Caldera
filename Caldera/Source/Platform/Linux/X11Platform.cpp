@@ -25,11 +25,6 @@ X11Platform::X11Platform()
 
 X11Platform::~X11Platform() {}
 
-StringView X11Platform::getRequiredExtensions()
-{
-  return "";
-}
-
 float X11Platform::getAbsoluteTime() const
 {
   return 0.f;

@@ -17,8 +17,6 @@ class Win32Platform : public Platform
   Win32Platform();
   ~Win32Platform() override;
 
-  StringView getRequiredExtensions() override;
-
   float getAbsoluteTime() const override;
   void sleep(uint64_t ms) const override;
 };

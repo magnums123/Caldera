@@ -1,8 +1,10 @@
 #pragma once
 
 #include <Defines.hpp>
+
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#include <xcb/xcb_keysyms.h>
 
 #include "../Window.hpp"
 
@@ -13,7 +15,7 @@ class X11Window : public Window
 {
   public:
   X11Window(const WindowCreateInfo& createInfo);
-  ~X11Window() = default;
+  ~X11Window() override;
 
   void toggleFullscreen() override;
   bool shouldClose() override;
@@ -22,6 +24,10 @@ class X11Window : public Window
 
   private:
   xcb_window_t windowID{0};
+  xcb_key_symbols_t* keySymbols{};
+  xcb_atom_t wmProtocols{};
+  xcb_atom_t wmDeleteWindow{};
+  bool m_shouldClose{false};
 };
 
 } // namespace CAL

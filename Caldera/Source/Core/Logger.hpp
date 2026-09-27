@@ -54,19 +54,19 @@ void logOutput(LogLevel level, std::source_location loc, StringView message);
   {                                                                                                \
     if constexpr (enabled)                                                                         \
     {                                                                                              \
-      CAL::log(level, std::source_location::current(), fmt, ##__VA_ARGS__);                        \
+      ::CAL::log(level, std::source_location::current(), fmt, ##__VA_ARGS__);                        \
     }                                                                                              \
   } while (false)
 
 #define LOG_FATAL(fmt, ...)                                                                        \
-  CAL_LOG_IMPL(CAL::LogLevel::Fatal, CAL::LOG_FATAL_ENABLED, fmt, ##__VA_ARGS__)
+  CAL_LOG_IMPL(::CAL::LogLevel::Fatal, ::CAL::LOG_FATAL_ENABLED, fmt, ##__VA_ARGS__)
 #define LOG_ERROR(fmt, ...)                                                                        \
-  CAL_LOG_IMPL(CAL::LogLevel::Error, CAL::LOG_ERROR_ENABLED, fmt, ##__VA_ARGS__)
+  CAL_LOG_IMPL(::CAL::LogLevel::Error, ::CAL::LOG_ERROR_ENABLED, fmt, ##__VA_ARGS__)
 #define LOG_WARN(fmt, ...)                                                                         \
-  CAL_LOG_IMPL(CAL::LogLevel::Warn, CAL::LOG_WARN_ENABLED, fmt, ##__VA_ARGS__)
+  CAL_LOG_IMPL(::CAL::LogLevel::Warn, ::CAL::LOG_WARN_ENABLED, fmt, ##__VA_ARGS__)
 #define LOG_INFO(fmt, ...)                                                                         \
-  CAL_LOG_IMPL(CAL::LogLevel::Info, CAL::LOG_INFO_ENABLED, fmt, ##__VA_ARGS__)
+  CAL_LOG_IMPL(::CAL::LogLevel::Info, ::CAL::LOG_INFO_ENABLED, fmt, ##__VA_ARGS__)
 #define LOG_DEBUG(fmt, ...)                                                                        \
-  CAL_LOG_IMPL(CAL::LogLevel::Debug, CAL::LOG_DEBUG_ENABLED, fmt, ##__VA_ARGS__)
+  CAL_LOG_IMPL(::CAL::LogLevel::Debug, ::CAL::LOG_DEBUG_ENABLED, fmt, ##__VA_ARGS__)
 #define LOG_TRACE(fmt, ...)                                                                        \
-  CAL_LOG_IMPL(CAL::LogLevel::Trace, CAL::LOG_TRACE_ENABLED, fmt, ##__VA_ARGS__)
+  CAL_LOG_IMPL(::CAL::LogLevel::Trace, ::CAL::LOG_TRACE_ENABLED, fmt, ##__VA_ARGS__)

@@ -5,6 +5,10 @@
 
 #include "Utility/String.hpp"
 
+#if defined(__linux__)
+#include <X11/keysym.h>
+#endif
+
 namespace CAL
 {
 
@@ -416,14 +420,160 @@ inline const std::map<uint8_t, KeyCodeID> Win32KeyTable{
     {0xDD, KeyCodeID::RightBrace},
     {0xDE, KeyCodeID::Apostrophe},
 };
-}
+
 
 constexpr KeyCodeID KeyCodeFromWParam(uint8_t wParam) noexcept
 {
   return KeyCodeDetail::Win32KeyTable.find(wParam)->second;
 }
 
+#elif defined(__linux__)
+
+inline const std::map<uint32_t, KeyCodeID> LinuxKeyTable
+{
+    {XK_BackSpace, KeyCodeID::Backspace},
+    {XK_Tab, KeyCodeID::Tab},
+    {XK_Return, KeyCodeID::Enter},
+
+    {XK_Shift_L, KeyCodeID::LeftShift},
+    {XK_Shift_R, KeyCodeID::RightShift},
+    {XK_Control_L, KeyCodeID::LeftControl},
+    {XK_Control_R, KeyCodeID::RightControl},
+    {XK_Alt_L, KeyCodeID::LeftAlt},
+    {XK_Alt_R, KeyCodeID::RightAlt},
+
+    {XK_Pause, KeyCodeID::Pause},
+    {XK_Caps_Lock, KeyCodeID::CapsLock},
+    {XK_Escape, KeyCodeID::Escape},
+    {XK_space, KeyCodeID::Space},
+
+    {XK_Page_Up, KeyCodeID::PageUp},
+    {XK_Page_Down, KeyCodeID::PageDown},
+    {XK_End, KeyCodeID::End},
+    {XK_Home, KeyCodeID::Home},
+    {XK_Left, KeyCodeID::Left},
+    {XK_Up, KeyCodeID::Up},
+    {XK_Right, KeyCodeID::Right},
+    {XK_Down, KeyCodeID::Down},
+    {XK_Print, KeyCodeID::PrintScreen},
+    {XK_Insert, KeyCodeID::Insert},
+    {XK_Delete, KeyCodeID::Delete},
+
+    {XK_0, KeyCodeID::Num0},
+    {XK_1, KeyCodeID::Num1},
+    {XK_2, KeyCodeID::Num2},
+    {XK_3, KeyCodeID::Num3},
+    {XK_4, KeyCodeID::Num4},
+    {XK_5, KeyCodeID::Num5},
+    {XK_6, KeyCodeID::Num6},
+    {XK_7, KeyCodeID::Num7},
+    {XK_8, KeyCodeID::Num8},
+    {XK_9, KeyCodeID::Num9},
+
+    {XK_a, KeyCodeID::A},
+    {XK_b, KeyCodeID::B},
+    {XK_c, KeyCodeID::C},
+    {XK_d, KeyCodeID::D},
+    {XK_e, KeyCodeID::E},
+    {XK_f, KeyCodeID::F},
+    {XK_g, KeyCodeID::G},
+    {XK_h, KeyCodeID::H},
+    {XK_i, KeyCodeID::I},
+    {XK_j, KeyCodeID::J},
+    {XK_k, KeyCodeID::K},
+    {XK_l, KeyCodeID::L},
+    {XK_m, KeyCodeID::M},
+    {XK_n, KeyCodeID::N},
+    {XK_o, KeyCodeID::O},
+    {XK_p, KeyCodeID::P},
+    {XK_q, KeyCodeID::Q},
+    {XK_r, KeyCodeID::R},
+    {XK_s, KeyCodeID::S},
+    {XK_t, KeyCodeID::T},
+    {XK_u, KeyCodeID::U},
+    {XK_v, KeyCodeID::V},
+    {XK_w, KeyCodeID::W},
+    {XK_x, KeyCodeID::X},
+    {XK_y, KeyCodeID::Y},
+    {XK_z, KeyCodeID::Z},
+
+    {XK_Super_L, KeyCodeID::LeftSuper},
+    {XK_Super_R, KeyCodeID::RightSuper},
+    {XK_Menu, KeyCodeID::Applications},
+
+    {XK_KP_0, KeyCodeID::Numpad0},
+    {XK_KP_1, KeyCodeID::Numpad1},
+    {XK_KP_2, KeyCodeID::Numpad2},
+    {XK_KP_3, KeyCodeID::Numpad3},
+    {XK_KP_4, KeyCodeID::Numpad4},
+    {XK_KP_5, KeyCodeID::Numpad5},
+    {XK_KP_6, KeyCodeID::Numpad6},
+    {XK_KP_7, KeyCodeID::Numpad7},
+    {XK_KP_8, KeyCodeID::Numpad8},
+    {XK_KP_9, KeyCodeID::Numpad9},
+
+    {XK_KP_Multiply, KeyCodeID::Multiply},
+    {XK_KP_Add, KeyCodeID::Add},
+    {XK_KP_Separator, KeyCodeID::Separator},
+    {XK_KP_Subtract, KeyCodeID::Subtract},
+    {XK_KP_Decimal, KeyCodeID::Decimal},
+    {XK_KP_Divide, KeyCodeID::Divide},
+
+    {XK_F1, KeyCodeID::F1},
+    {XK_F2, KeyCodeID::F2},
+    {XK_F3, KeyCodeID::F3},
+    {XK_F4, KeyCodeID::F4},
+    {XK_F5, KeyCodeID::F5},
+    {XK_F6, KeyCodeID::F6},
+    {XK_F7, KeyCodeID::F7},
+    {XK_F8, KeyCodeID::F8},
+    {XK_F9, KeyCodeID::F9},
+    {XK_F10, KeyCodeID::F10},
+    {XK_F11, KeyCodeID::F11},
+    {XK_F12, KeyCodeID::F12},
+    {XK_F13, KeyCodeID::F13},
+    {XK_F14, KeyCodeID::F14},
+    {XK_F15, KeyCodeID::F15},
+    {XK_F16, KeyCodeID::F16},
+    {XK_F17, KeyCodeID::F17},
+    {XK_F18, KeyCodeID::F18},
+    {XK_F19, KeyCodeID::F19},
+    {XK_F20, KeyCodeID::F20},
+    {XK_F21, KeyCodeID::F21},
+    {XK_F22, KeyCodeID::F22},
+    {XK_F23, KeyCodeID::F23},
+    {XK_F24, KeyCodeID::F24},
+
+    {XK_Num_Lock, KeyCodeID::Numlock},
+    {XK_Scroll_Lock, KeyCodeID::ScrollLock},
+
+    {XK_semicolon, KeyCodeID::Semicolon},
+    {XK_equal, KeyCodeID::Plus},
+    {XK_comma, KeyCodeID::Comma},
+    {XK_minus, KeyCodeID::Minus},
+    {XK_period, KeyCodeID::Period},
+    {XK_slash, KeyCodeID::Slash},
+    {XK_grave, KeyCodeID::Grave},
+
+    {XK_bracketleft, KeyCodeID::LeftBrace},
+    {XK_backslash, KeyCodeID::Backslash},
+    {XK_bracketright, KeyCodeID::RightBrace},
+    {XK_apostrophe, KeyCodeID::Apostrophe},
+};
+
+constexpr KeyCodeID KeyCodeFromLinuxKeySym(uint32_t keySym) noexcept
+{
+  const auto it = KeyCodeDetail::LinuxKeyTable.find(keySym);
+
+  if (it == KeyCodeDetail::LinuxKeyTable.end())
+    return KeyCodeID::Unknown;
+
+  return it->second;
+}
+
+
 #endif
+}
 
 constexpr StringView keyCodeToString(KeyCodeID key) noexcept
 {

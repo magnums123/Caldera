@@ -1,4 +1,4 @@
-#include "X11Platform.hpp"
+#include "Win32Platform.hpp"
 
 #include "Core/Memory.hpp"
 
@@ -37,10 +37,6 @@ Win32Platform::Win32Platform()
 
 Win32Platform::~Win32Platform() {}
 
-StringView Win32Platform::getRequiredExtensions()
-{
-  return vk::KHRWin32SurfaceExtensionName;
-}
 
 float Win32Platform::getAbsoluteTime() const
 {

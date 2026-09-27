@@ -28,7 +28,7 @@ void report_assertion_failure(StringView expression, StringView message, std::so
     }                                                                                              \
     else                                                                                           \
     {                                                                                              \
-      CAL::report_assertion_failure(#expr, "", std::source_location::current());                   \
+      ::CAL::report_assertion_failure(#expr, "", std::source_location::current());                   \
       debugBreak();                                                                                \
     }                                                                                              \
   } while (false)
@@ -41,7 +41,7 @@ void report_assertion_failure(StringView expression, StringView message, std::so
     }                                                                                              \
     else                                                                                           \
     {                                                                                              \
-      CAL::report_assertion_failure(#expr, message, std::source_location::current());              \
+      ::CAL::report_assertion_failure(#expr, message, std::source_location::current());              \
       debugBreak();                                                                                \
     }                                                                                              \
   } while (false)
@@ -55,7 +55,7 @@ void report_assertion_failure(StringView expression, StringView message, std::so
     }                                                                                              \
     else                                                                                           \
     {                                                                                              \
-      CAL::report_assertion_failure(#expr, "", std::source_location::current());                   \
+      ::CAL::report_assertion_failure(#expr, "", std::source_location::current());                   \
       debugBreak();                                                                                \
     }                                                                                              \
   } while (false)
@@ -68,7 +68,7 @@ void report_assertion_failure(StringView expression, StringView message, std::so
     }                                                                                              \
     else                                                                                           \
     {                                                                                              \
-      CAL::report_assertion_failure(#expr, message, std::source_location::current());              \
+      ::CAL::report_assertion_failure(#expr, message, std::source_location::current());              \
       debugBreak();                                                                                \
     }                                                                                              \
   } while (false)

@@ -59,17 +59,18 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
                                  [&](Event& e)
                                  {
                                    auto event = e.toType<const WindowResizeEvent*>();
-                                   renderer->resize(event->getWidth(), event->getHeight());
+                                   renderer->resize(event->getWidth(),
+                                                    event->getHeight());
                                  });
 
   // LOG_DEBUG("Current Running Dir: {}", std::filesystem::current_path().string());
 
-  MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj", renderer);
-  MeshHandle suzanne = assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
-  assetManager->unloadMesh(suzanne);
-
-  auto mesh = assetManager->getMesh(suzanne);
-
+  // MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj", renderer);
+  // MeshHandle suzanne = assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
+  // assetManager->unloadMesh(suzanne);
+  //
+  // auto mesh = assetManager->getMesh(suzanne);
+  //
   isRunning = true;
   isSuspended = false;
 }
