@@ -1,8 +1,10 @@
 #pragma once
 
 #include <Defines.hpp>
+#include <cstdint>
 
 #include "Renderer/Renderer.hpp"
+#include "Renderer/Shader/Shader.hpp"
 #include "Renderer/Vulkan/VulkanTypes.hpp"
 
 namespace CAL
@@ -10,20 +12,22 @@ namespace CAL
 
 class VulkanRenderer : public Renderer
 {
-  public:
-  VulkanRenderer(const RendererInfo& rendererInfo);
+public:
+  VulkanRenderer(const RendererInfo &rendererInfo);
   ~VulkanRenderer() override;
 
-  void drawFrame(const RenderPacket& packet) override;
+  void drawFrame(const RenderPacket &packet) override;
   void resize(uint32_t width, uint32_t height) override;
 
-  Ref<Buffer> createVertexBuffer(void* data, size_t vertexCount) override;
-  Ref<Buffer> createIndexBuffer(void* data, size_t indexCount) override;
+  Ref<Buffer> createVertexBuffer(void *data, size_t vertexCount) override;
+  Ref<Buffer> createIndexBuffer(void *data, size_t indexCount) override;
 
-  private:
+private:
   VulkanContext context{};
   bool beginFrame(float deltaTime) override;
   bool endFrame(float deltaTime) override;
+  uint64_t nextSignalValue;
+  void recreateSwapchain();
 };
 
 } // namespace CAL

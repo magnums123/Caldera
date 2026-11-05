@@ -2,8 +2,8 @@
 
 #include <EntryPoint.hpp>
 
-std::unique_ptr<CAL::Game> CAL::createGame()
-{
+std::unique_ptr<CAL::Game> CAL::createGame() {
+  std::filesystem::current_path("../../Sandbox/");
   return std::make_unique<SandboxGame>();
 }
 

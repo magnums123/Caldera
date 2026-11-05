@@ -18,6 +18,8 @@ elseif(UNIX)
     pkg_check_modules(XCB_KEYSYMS REQUIRED xcb-keysyms)
 endif()
 
+find_library(SHADERC_LIBRARY NAMES shaderc REQUIRED)
+
 # 1. Build Caldera as a shared library
 add_library(${PROJECT_NAME} SHARED ${ENGINE_SOURCES})
 
@@ -70,6 +72,7 @@ target_compile_definitions(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	vulkan 
 	Vulkan::Headers 
+  ${SHADERC_LIBRARY}
 	VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp
 	${XCB_LIBRARIES}
   ${XCB_KEYSYMS_LIBRARIES}

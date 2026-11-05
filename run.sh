@@ -34,7 +34,7 @@ if [ -f "build/Sandbox/Sandbox" ]; then
     cd build/Sandbox || exit 1
 
     if [ "$BUILD_TYPE" = "Debug" ]; then
-        gdb -ex run ./Sandbox
+        gdb -q -ex run ./Sandbox
     else
         ./Sandbox
     fi

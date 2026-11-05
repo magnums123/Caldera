@@ -8,25 +8,24 @@
 #include "Core/Clock.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Memory.hpp"
-#include "Core/UUID.hpp"
 
 #include "Core/Event/Event.hpp"
+#include "Core/Event/KeyEvents.hpp"
 #include "Core/Event/WindowEvents.hpp"
 
+#include "Event/KeyCodes.hpp"
 #include "Game/Game.hpp"
 
 #include "Renderer/Renderer.hpp"
+#include "Renderer/Shader/Shader.hpp"
+#include "Renderer/Shader/ShaderCompiler.hpp"
+#include "Utility/FileReader.hpp"
 
-namespace CAL
-{
+namespace CAL {
 
-Application::Application(const AppInfo& appInfo, Ref<Game> game)
-    : window(nullptr)
-    , gameInstance(std::move(game))
-    , platform(Platform::Create())
-    , clock(nullptr)
-    , headless(appInfo.headless)
-{
+Application::Application(const AppInfo &appInfo, Ref<Game> game)
+    : window(nullptr), gameInstance(std::move(game)),
+      platform(Platform::Create()), clock(nullptr), headless(appInfo.headless) {
   Memory::initMemory();
   clock = CreateRef<Clock>(Memory::MemoryTag::APPLICATION, platform);
 
@@ -34,8 +33,9 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
     // Do headless configuration
     return;
 
-  WindowCreateInfo createInfo{
-      .name = appInfo.appName, .width = appInfo.width, .height = appInfo.height};
+  WindowCreateInfo createInfo{.name = appInfo.appName,
+                              .width = appInfo.width,
+                              .height = appInfo.height};
   window = Window::Create(createInfo);
 
   RendererInfo rendererInfo{.width = appInfo.width,
@@ -48,40 +48,44 @@ Application::Application(const AppInfo& appInfo, Ref<Game> game)
   assetManager = CreateRef<AssetManager>(Memory::MemoryTag::APPLICATION);
   // gameInstance.assetManager = assetManager;
 
-  // TEMP
-  window->dispatcher.addListener(EventType::WINDOW_CLOSED,
-                                 [&](Event& e)
-                                 {
-                                   isRunning = false;
-                                   e.handle();
-                                 });
-  window->dispatcher.addListener(EventType::WINDOW_RESIZED,
-                                 [&](Event& e)
-                                 {
-                                   auto event = e.toType<const WindowResizeEvent*>();
-                                   renderer->resize(event->getWidth(),
-                                                    event->getHeight());
-                                 });
+  window->dispatcher.addListener(EventType::WINDOW_CLOSED, [&](Event &e) {
+    isRunning = false;
+    e.handle();
+  });
+  window->dispatcher.addListener(EventType::WINDOW_RESIZED, [&](Event &e) {
+    auto event = e.toType<const WindowResizeEvent *>();
+    renderer->resize(event->getWidth(), event->getHeight());
+  });
+  window->dispatcher.addListener(EventType::KEY_PRESSED, [&](Event &e) {
+    auto event = e.toType<const KeyPressEvent *>();
+    LOG_DEBUG("Key Pressed: {}", keyCodeToString(event->getKeyCode()));
+  });
 
-  // LOG_DEBUG("Current Running Dir: {}", std::filesystem::current_path().string());
+  // LOG_DEBUG("Current Running Dir: {}",
+  // std::filesystem::current_path().string());
 
-  // MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj", renderer);
-  // MeshHandle suzanne = assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
+  // MeshHandle monkey = assetManager->loadMesh("./Assets/Models/monkey.obj",
+  // renderer); MeshHandle suzanne =
+  // assetManager->loadMesh("./Assets/Models/suzanne.obj", renderer);
   // assetManager->unloadMesh(suzanne);
   //
   // auto mesh = assetManager->getMesh(suzanne);
   //
   isRunning = true;
   isSuspended = false;
+
+  // LOG_DEBUG("{}", Utility::readTextFile("test.txt"));
+
+  ShaderCompiler shaderCompiler{};
+  auto vetexShader = shaderCompiler.compileShader(
+      "Assets/Shaders/testVert.glsl", ShaderType::Vertex);
+  auto fragmentShader = shaderCompiler.compileShader(
+      "Assets/Shaders/testFrag.glsl", ShaderType::Fragment);
 }
 
-Application::~Application()
-{
-  Memory::shutdownMemory();
-}
+Application::~Application() { Memory::shutdownMemory(); }
 
-void Application::run()
-{
+void Application::run() {
   clock->update();
   lastTime = clock->getElapsedTime();
 
@@ -91,11 +95,9 @@ void Application::run()
 
   LOG_DEBUG("{}", Memory::getMemoryUsageString());
 
-  while (isRunning)
-  {
+  while (isRunning) {
     window->update();
-    if (!isSuspended)
-    {
+    if (!isSuspended) {
       clock->update();
       float currentTime{clock->getElapsedTime()};
       float deltaTime{currentTime - lastTime};

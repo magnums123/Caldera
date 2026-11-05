@@ -8,13 +8,15 @@
 namespace CAL
 {
 
-VulkanCommandBuffer::VulkanCommandBuffer(const VulkanContext& context,
-                                         const vk::CommandPool& commandPool, bool isPrimary)
+VulkanCommandBuffer::VulkanCommandBuffer(const VulkanContext &context,
+                                         const vk::CommandPool &commandPool,
+                                         bool isPrimary)
 {
-  vk::CommandBufferAllocateInfo allocInfo{.commandPool = commandPool,
-                                          .level = isPrimary ? vk::CommandBufferLevel::ePrimary
-                                                             : vk::CommandBufferLevel::eSecondary,
-                                          .commandBufferCount = 1};
+  vk::CommandBufferAllocateInfo allocInfo{
+      .commandPool = commandPool,
+      .level = isPrimary ? vk::CommandBufferLevel::ePrimary
+                         : vk::CommandBufferLevel::eSecondary,
+      .commandBufferCount = 1};
 
   handle = context.device->logicalDevice.allocateCommandBuffers(allocInfo)[0];
   state = CommandBufferState::Ready;
@@ -56,19 +58,19 @@ void VulkanCommandBuffer::reset()
   state = CommandBufferState::Ready;
 }
 
-VulkanCommandBuffer
-VulkanCommandBuffer::allocateAndBeginSingleUseCommandBuffer(const VulkanContext& context,
-                                                            vk::CommandPool commandPool)
+VulkanCommandBuffer VulkanCommandBuffer::allocateAndBeginSingleUseCommandBuffer(
+    const VulkanContext &context, vk::CommandPool commandPool)
 {
   VulkanCommandBuffer buffer{context, commandPool, true};
   buffer.begin(true, false);
   return buffer;
 }
 
-void VulkanCommandBuffer::endSingleTimeCommandBuffer(VulkanCommandBuffer& commandBuffer,
-                                                     const vk::Queue& queue)
+void VulkanCommandBuffer::endSingleTimeCommandBuffer(
+    VulkanCommandBuffer &commandBuffer, const vk::Queue &queue)
 {
-  vk::SubmitInfo submitInfo{.commandBufferCount = 1, .pCommandBuffers = &commandBuffer.handle};
+  vk::SubmitInfo submitInfo{.commandBufferCount = 1,
+                            .pCommandBuffers = &commandBuffer.handle};
   queue.submit(submitInfo);
   queue.waitIdle();
 }

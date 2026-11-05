@@ -27,6 +27,9 @@ struct VulkanDevice
   vk::Queue transferQueue{nullptr};
 
   VulkanSwapchainInfo swapchainInfo{};
+
+  private:
+  const VulkanContext& context;
 };
 
 } // namespace CAL

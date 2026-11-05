@@ -1,45 +1,25 @@
 BasedOnStyle: LLVM
 
+BreakBeforeBraces: Custom
+
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeWhile: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
-
-BreakBeforeBraces: Allman
-
-AccessModifierOffset: 0
-IndentAccessModifiers: false
-
-NamespaceIndentation: None
-FixNamespaceComments: true
-
-PointerAlignment: Left
-ReferenceAlignment: Left
-
-SpaceBeforeParens: ControlStatements
-SpaceBeforeAssignmentOperators: true
-
-ColumnLimit: 90
-
-AllowShortFunctionsOnASingleLine: Empty
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AllowShortBlocksOnASingleLine: false
-
-BreakBeforeBinaryOperators: None
-BreakConstructorInitializers: BeforeComma
-
-SortIncludes: Never
-IncludeBlocks: Preserve
-
-DerivePointerAlignment: false
-
-KeepEmptyLinesAtTheStartOfBlocks: false
-MaxEmptyLinesToKeep: 1
-
-ReflowComments: false
-
-CommentPragmas: '^ IWYU pragma:'
-
-NamespaceMacros:
-  - CAL_NAMESPACE_BEGIN
-  - CAL_NAMESPACE_END
+ColumnLimit: 80
+AlignAfterOpenBracket: Align

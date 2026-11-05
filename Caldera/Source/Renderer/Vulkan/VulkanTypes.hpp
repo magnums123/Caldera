@@ -8,37 +8,38 @@
 
 #include "Core/Containers/Vector.hpp"
 
+#include "Renderer/Shader/ShaderCompiler.hpp"
 #include "Renderer/Vulkan/Structures/VulkanCommandBuffer.hpp"
 
-namespace CAL
-{
+namespace CAL {
 struct VulkanDevice;
 struct VulkanSwapchain;
 
-struct VulkanSwapchainInfo
-{
+struct VulkanSwapchainInfo {
   vk::SurfaceCapabilitiesKHR surfaceCapabilities{};
   Vector<vk::SurfaceFormatKHR> surfaceFormats{};
   Vector<vk::PresentModeKHR> presentModes{};
 };
 
-struct QueueFamilyIndices
-{
+struct QueueFamilyIndices {
   std::optional<uint32_t> graphicsFamily;
   std::optional<uint32_t> presentFamily;
   std::optional<uint32_t> computeFamily;
   std::optional<uint32_t> transferFamily;
 
-  bool isComplete() const
-  {
-    return (graphicsFamily.has_value() && computeFamily.has_value() && transferFamily.has_value() &&
-            presentFamily.has_value());
+  bool isComplete() const {
+    return (graphicsFamily.has_value() && computeFamily.has_value() &&
+            transferFamily.has_value() && presentFamily.has_value());
   }
 };
 
-struct VulkanContext
-{
-  vk::AllocationCallbacks* allocator{nullptr};
+struct FrameResources {
+  Ref<VulkanCommandBuffer> graphicsCommandBuffer{nullptr};
+  vk::Semaphore imageAcquiredSemaphore{nullptr};
+};
+
+struct VulkanContext {
+  vk::AllocationCallbacks *allocator{nullptr};
   vk::Instance instance{nullptr};
   vk::SurfaceKHR surface{nullptr};
   Ref<VulkanDevice> device{nullptr};
@@ -48,7 +49,10 @@ struct VulkanContext
   Ref<VulkanSwapchain> swapchain{};
 
   vk::CommandPool graphicsCommandPool{nullptr};
-  Vector<Ref<VulkanCommandBuffer>> graphicsCommandBuffers{};
+  vk::Semaphore timelineSemaphore{nullptr};
+  Vector<FrameResources> frameResources{};
+
+  ShaderCompiler shaderCompiler{};
 };
 
 } // namespace CAL

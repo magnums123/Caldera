@@ -32,8 +32,10 @@ struct VulkanSwapchain
   private:
   uint32_t width, height;
 
-  static vk::SurfaceFormatKHR chooseBestSurfaceFormat(const Vector<vk::SurfaceFormatKHR>& formats);
-  static vk::PresentModeKHR chooseBestPresentMode(const Vector<vk::PresentModeKHR>& presentModes);
+  static vk::SurfaceFormatKHR
+  chooseBestSurfaceFormat(const Vector<vk::SurfaceFormatKHR>& formats);
+  static vk::PresentModeKHR
+  chooseBestPresentMode(const Vector<vk::PresentModeKHR>& presentModes);
 };
 
 } // namespace CAL
